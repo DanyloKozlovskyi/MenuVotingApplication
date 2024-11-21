@@ -15,7 +15,7 @@ namespace MenuVoting.DataAccess.Models
 		[ForeignKey(nameof(ApplicationUser))]
 		public Guid UserId { get; set; }
 		virtual public ApplicationUser? User { get; set; }
-		[ForeignKey(nameof(Menu))]
+		[ForeignKey(nameof(MenuVoting.DataAccess.Models.Menu))]
 		public Guid MenuId { get; set; }
 		virtual public Menu? Menu { get; set; }
 	}

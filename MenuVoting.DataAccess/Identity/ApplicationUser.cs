@@ -17,5 +17,6 @@ namespace MenuVoting.DataAccess.Identity
 		[ForeignKey(nameof(Restaurant))]
 		public Guid RestaurantId { get; set; }
 		public Restaurant? Restaurant { get; set; }
+		public virtual ICollection<Vote>? Votes { get; set; }
 	}
 }
