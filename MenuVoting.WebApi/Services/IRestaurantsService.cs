@@ -5,13 +5,13 @@ namespace MenuVoting.WebApi.Services
 {
 	public interface IRestaurantsService
 	{
-		Task<IEnumerable<Restaurant>> GetMenuRestaurants();
+		Task<IEnumerable<Restaurant>> GetRestaurants();
 
 		Task<Restaurant?> GetRestaurantById(Guid id);
 
 		Task<bool> UpdateRestaurant(Guid id, Restaurant restaurant);
 
-		Task CreateRestaurant(RestaurantCreate restaurantCreate);
+		Task<Restaurant> CreateRestaurant(RestaurantCreate restaurantCreate);
 
 		Task<bool> DeleteRestaurant(Guid id);
 	}

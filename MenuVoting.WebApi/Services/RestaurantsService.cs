@@ -23,11 +23,12 @@ namespace MenuVoting.WebApi.Services
 			mapper = map.CreateMapper();
 		}
 
-		public async Task CreateRestaurant(RestaurantCreate restaurantCreate)
+		public async Task<Restaurant> CreateRestaurant(RestaurantCreate restaurantCreate)
 		{
 			Restaurant restaurant = mapper.Map<Restaurant>(restaurantCreate);
 			dbContext.Restaurants.Add(restaurant);
 			await dbContext.SaveChangesAsync();
+			return restaurant;
 		}
 
 		public async Task<bool> DeleteRestaurant(Guid id)
@@ -44,7 +45,7 @@ namespace MenuVoting.WebApi.Services
 			return true;
 		}
 
-		public async Task<IEnumerable<Restaurant>> GetMenuRestaurants()
+		public async Task<IEnumerable<Restaurant>> GetRestaurants()
 		{
 			return await dbContext.Restaurants.ToListAsync();
 		}
