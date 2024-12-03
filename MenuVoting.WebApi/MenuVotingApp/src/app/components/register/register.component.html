@@ -1,0 +1,135 @@
+<div class="w-50 margin-auto">
+  <div class="form-container">
+
+    <h2>Register</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="registerSubmitted()">
+      <!-- Name -->
+      <div class="form-field flex">
+        <div class="w-25">
+
+          <label for="name" class="form-label pt">Person Name</label>
+
+        </div>
+        <div class="flex-1">
+          <input type="text" id="name" class="form-input" formControlName="personName" />
+          <span class="text-red" *ngIf="(registerNameControl.touched || isRegisterFormSubmitted) && (registerNameControl.errors?.['required'])">Person Name can't be blank</span>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-field flex">
+        <div class="w-25">
+
+          <label for="email" class="form-label pt">Email</label>
+        </div>
+
+        <div class="flex-1">
+          <input type="text" id="email" class="form-input" formControlName="email" />
+          <span class="text-red" *ngIf="(registerEmailControl.touched || isRegisterFormSubmitted) && (registerEmailControl.errors?.['required'])">Email can't be blank</span>
+
+          <span class="text-red" *ngIf="(isRegisterFormSubmitted) && (registerEmailControl.errors?.['email'])">Email should be in a proper format</span>
+        </div>
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-field flex">
+        <div class="w-25">
+
+          <label for="phone" class="form-label pt">Phone Number</label>
+        </div>
+        <div class="flex-1">
+          <input type="text" id="phone" class="form-input" formControlName="phoneNumber" />
+          <span class="text-red" *ngIf="(registerPhoneControl.touched || isRegisterFormSubmitted) && (registerPhoneControl.errors?.['required'])">Phone Number can't be blank</span>
+
+        </div>
+      </div>
+
+      <!-- Restaurant -->
+
+      <div class="form-field flex">
+        <div class="w-25 select-box">
+          <input type="text" id="restaurantInput " class="search-box" placeholder="Select your restaurant">
+          <ul formArrayName="restaurants" id="restaurantList" class="options">
+            <li id="option" *ngFor="let r of restaurants" value="{{r.name + ', ' + r.address}}">{{r.name + ', ' + r.address}}</li>
+          </ul>
+        </div>
+      </div>
+
+
+      <!-- Password -->
+      <div class="form-field flex">
+        <div class="w-25">
+
+          <label for="password" class="form-label pt">Password</label>
+        </div>
+        <div class="flex-1">
+          <input type="password" id="password" class="form-input" formControlName="password" />
+          <span class="text-red" *ngIf="(registerPasswordControl.touched || isRegisterFormSubmitted) && (registerPasswordControl.errors?.['required'])">Password can't be blank</span>
+
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-field flex">
+        <div class="w-25">
+
+          <label for="confirmPassword" class="form-label pt">Confirm Password</label>
+        </div>
+        <div class="flex-1">
+          <input type="password" id="confirmPassword" class="form-input" formControlName="confirmPassword" />
+          <span class="text-red" *ngIf="(registerConfirmPasswordControl.touched || isRegisterFormSubmitted) && (registerConfirmPasswordControl.errors?.['required'])">Confirm Password can't be blank</span>
+
+          <span class="text-red" *ngIf="(registerConfirmPasswordControl.touched || isRegisterFormSubmitted) && (registerConfirmPasswordControl.errors?.['compareValidator'])">Password and Confirm Password doesn't match</span>
+
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="form-field flex">
+        <div class="w-25">
+          <button type="submit" class="button button-green-back">Register</button>
+        </div>
+        <div class="flex-1">
+          <span class="text-red" *ngIf="!isRegisterValid">Some credentials entered incorrectly</span>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const restaurantInput = document.getElementById('restaurantInput');
+    const restaurantList = document.getElementById('restaurantList');
+    const restaurantOptions = restaurantList.getElementById('option');
+
+    // Show the list when the input is focused
+    restaurantInput.addEventListener('focus', () => {
+      restaurantList.classList.remove('hidden');
+    });
+
+    // Hide the list if clicking outside the input or the list
+    document.addEventListener('click', (event) => {
+      if (!restaurantInput.contains(event.target) && !restaurantList.contains(event.target)) {
+        restaurantList.classList.add('hidden');
+      }
+    });
+
+    // When a user clicks on a restaurant option
+    Array.from(restaurantOptions).forEach(option => {
+      option.addEventListener('click', () => {
+        // Get the name and address data from the option
+        const value = option.getAttribute('value');
+        const name = value.split(', ')[0];
+        const address = value.split(', ')[1];
+
+        // Set the input field with the selected restaurant info
+        restaurantInput.value = `${name}, ${address}`;
+
+        // Hide the list after selection
+        restaurantList.classList.add('hidden');
+      });
+    });
+  });
+</script>

@@ -1,5 +1,6 @@
 using MenuVoting.DataAccess;
 using MenuVoting.DataAccess.Identity;
+using MenuVoting.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -54,6 +55,26 @@ builder.Services.AddAuthentication(options =>
 
 });
 
+builder.Services.AddScoped<IMenuVotingsService, MenuVotingsService>();
+builder.Services.AddScoped<IRestaurantsService, RestaurantsService>();
+builder.Services.AddTransient<IJwtService, JwtService>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+	options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "MenuVoting WebApi", Version = "1.0" });
+});
+
+builder.Services.AddCors(options =>
+{
+	options.AddDefaultPolicy(policyBuilder =>
+	{
+		policyBuilder.WithOrigins("https://localhost:4200")
+		.AllowAnyHeader()
+		.AllowAnyMethod();
+	});
+});
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -63,6 +84,8 @@ app.UseHsts();
 // getting error with authorization cause UseRouting after UseAuthorization
 app.UseRouting();
 
+app.UseCors();
+
 app.UseHttpsRedirection();
 
 //UseAuthorization should be imported after UseCors() and UseHttpsRedirection() in order to avoid XMLHttpRequest has been blocked by Cors policy
@@ -70,5 +93,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+	app.UseSwagger();
+	app.UseSwaggerUI(options =>
+	{
+		options.SwaggerEndpoint("/swagger/v1/swagger.json", "1.0");
+	});
+}
 
 app.Run();
