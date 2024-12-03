@@ -11,5 +11,7 @@ namespace MenuVoting.DataAccess.Dtos
 	{
 		[Required(ErrorMessage = "restaurant name can't be blank")]
 		public string Name { get; set; }
+		[Required(ErrorMessage = "restaurant address can't be blank")]
+		public string Address { get; set; }
 	}
 }

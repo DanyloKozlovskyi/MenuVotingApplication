@@ -9,7 +9,7 @@ namespace MenuVoting.WebApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	[Authorize]
+	[AllowAnonymous]
 	public class RestaurantsController : ControllerBase
 	{
 		private readonly IRestaurantsService restaurantsService;
@@ -22,8 +22,8 @@ namespace MenuVoting.WebApi.Controllers
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants()
 		{
-			var restaurant = await restaurantsService.GetRestaurants();
-			return Ok(restaurant);
+			var restaurants = await restaurantsService.GetRestaurants();
+			return Ok(restaurants);
 		}
 
 		[HttpGet("{id}")]

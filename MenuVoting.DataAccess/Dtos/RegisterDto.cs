@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MenuVoting.DataAccess.Models;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MenuVoting.DataAccess.Dtos
 {
@@ -16,6 +18,9 @@ namespace MenuVoting.DataAccess.Dtos
 		[Required(ErrorMessage = "Phone number can't be blank")]
 		[RegularExpression("^[0-9]*$", ErrorMessage = "Phone number should contain digits only")]
 		public string PhoneNumber { get; set; } = string.Empty;
+
+		[Required(ErrorMessage = "Restaurant cannot be blank")]
+		public Guid RestaurantId { get; set; }
 
 
 		[Required(ErrorMessage = "Password can't be blank")]

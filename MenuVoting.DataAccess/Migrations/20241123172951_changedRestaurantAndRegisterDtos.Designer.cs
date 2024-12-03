@@ -3,6 +3,7 @@ using System;
 using MenuVoting.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MenuVoting.DataAccess.Migrations
 {
     [DbContext(typeof(MenuVotingDbContext))]
-    partial class MenuVotingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241123172951_changedRestaurantAndRegisterDtos")]
+    partial class changedRestaurantAndRegisterDtos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,26 +144,6 @@ namespace MenuVoting.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Restaurants");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a08aff22-1f11-4913-8296-6d96ac706321"),
-                            Address = "Sydney 10",
-                            Name = "McDonalds"
-                        },
-                        new
-                        {
-                            Id = new Guid("c5739bd7-0375-4b80-9bef-c76406d3fb39"),
-                            Address = "Toronto 7",
-                            Name = "KFC"
-                        },
-                        new
-                        {
-                            Id = new Guid("2c578a19-98dc-48c0-a460-3af245ce8d4e"),
-                            Address = "Washinghton 7",
-                            Name = "KFC"
-                        });
                 });
 
             modelBuilder.Entity("MenuVoting.DataAccess.Models.Vote", b =>

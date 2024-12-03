@@ -50,7 +50,16 @@ namespace MenuVoting.WebApi.Controllers
 			// Create user
 			ApplicationUser user = mapper.Map<ApplicationUser>(registerDTO);
 
-			IdentityResult result = await userManager.CreateAsync(user, registerDTO.Password);
+			IdentityResult result = null;
+			try
+			{
+				result = await userManager.CreateAsync(user, registerDTO.Password);
+			}
+			catch (Exception exc)
+			{
+				Console.WriteLine(exc.Message);
+			}
+
 
 			if (result.Succeeded)
 			{
