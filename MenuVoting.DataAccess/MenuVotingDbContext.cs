@@ -1,5 +1,7 @@
-﻿using MenuVoting.DataAccess.Models;
+﻿using MenuVoting.DataAccess.Identity;
+using MenuVoting.DataAccess.Models;
 using MenuVoting.DataAccess.Models.Configurations;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 namespace MenuVoting.DataAccess
 {
 	// I was getting build failed after Update-Database because I didn't install Npgsql.EntityFrameworkCore.PostgreSQL
-	public class MenuVotingDbContext : DbContext
+	public class MenuVotingDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
 	{
 		public DbSet<Menu> Menus { get; set; }
 		public DbSet<MenuPool> MenuPools { get; set; }

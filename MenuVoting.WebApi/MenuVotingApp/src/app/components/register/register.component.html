@@ -49,9 +49,9 @@
 
       <div class="form-field flex">
         <div class="w-25 select-box">
-          <input type="text" id="restaurantInput " class="search-box" placeholder="Select your restaurant">
-          <ul formArrayName="restaurants" id="restaurantList" class="options">
-            <li id="option" *ngFor="let r of restaurants" value="{{r.name + ', ' + r.address}}">{{r.name + ', ' + r.address}}</li>
+          <input type="text" #restaurantInput id="restaurantInput " class="search-box" placeholder="Select your restaurant" (focus)="showList()" (click)="preventClose($event)">
+          <ul formArrayName="restaurants" #restaurantList id="restaurantList" class="options" (click)="preventClose($event)">
+            <li id="option" *ngFor="let r of restaurants" (click)="selectRestaurant(r)" value="{{r.name + ', ' + r.address}}">{{r.name + ', ' + r.address}}</li>
           </ul>
         </div>
       </div>
@@ -99,6 +99,7 @@
 </div>
 
 <script>
+  console.log(1);
   document.addEventListener('DOMContentLoaded', () => {
     const restaurantInput = document.getElementById('restaurantInput');
     const restaurantList = document.getElementById('restaurantList');

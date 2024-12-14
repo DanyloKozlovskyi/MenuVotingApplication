@@ -25,7 +25,6 @@ namespace MenuVoting.WebApi.Services
 		{
 			DateTime expiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(configuration["Jwt:EXPIRATION_MINUTES"]));
 
-
 			Claim[] claims = new Claim[]
 				{
 					//JwtRegisteredClaimNames.Sub - user identity

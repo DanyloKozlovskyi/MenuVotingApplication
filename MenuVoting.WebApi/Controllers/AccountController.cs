@@ -3,6 +3,7 @@ using MenuVoting.DataAccess.Dtos;
 using MenuVoting.DataAccess.Identity;
 using MenuVoting.WebApi.Services;
 using MenuVoting.WebApi.Util;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -59,7 +60,6 @@ namespace MenuVoting.WebApi.Controllers
 			{
 				Console.WriteLine(exc.Message);
 			}
-
 
 			if (result.Succeeded)
 			{
@@ -125,7 +125,6 @@ namespace MenuVoting.WebApi.Controllers
 				{
 					Console.WriteLine($"await userManager.UpdateAsync(user): {exc.Message}");
 				}
-
 
 				return Ok(authenticationResponse);
 			}

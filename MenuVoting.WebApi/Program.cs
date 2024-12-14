@@ -22,6 +22,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<MenuVotingDbContext>(options =>
 {
 	options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+	options.UseMongoDB(builder.Configuration.GetConnectionString("MongoConnection"), "MyDatabase");
 });
 
 // Enable identity 

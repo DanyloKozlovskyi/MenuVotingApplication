@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from 'src/app/services/account/account.service';
@@ -6,6 +6,7 @@ import { RegisterUser } from 'src/app/models/register-user';
 import { CommonModule } from '@angular/common';
 import { Restaurant } from 'src/app/models/restaurant';
 import { RestaurantService } from 'src/app/services/restaurant/restaurant.service';
+
 
 @Component({
   selector: 'app-register',
@@ -19,8 +20,13 @@ export class RegisterComponent {
   isRegisterFormSubmitted: boolean = false;
   isRegisterValid: boolean = true;
   restaurants: Restaurant[] = [];
+  selectedRestaurant: Restaurant | null = null;
 
-  constructor(private accountService: AccountService, private restaurantService: RestaurantService, private router: Router) {
+  constructor(private accountService: AccountService, private restaurantService: RestaurantService, private router: Router, private renderer: Renderer2) {
+    this.renderer.listen('document', 'click', () => {
+      this.hideList();
+    });
+
     this.registerForm = new FormGroup({
       personName: new FormControl(null, [Validators.required]),
       email: new FormControl(null, [Validators.required, Validators.email]),
@@ -32,6 +38,29 @@ export class RegisterComponent {
     this.fillRestaurants();
   }
 
+  @ViewChild('restaurantList', { static: false }) restaurantList!: ElementRef;
+  @ViewChild('restaurantInput', { static: false }) restaurantInput!: ElementRef;
+
+  showList() {
+    console.log(this.restaurants);
+    const restaurantList = this.restaurantList.nativeElement;
+    restaurantList.classList.remove('hidden');
+  }
+
+  hideList() {
+    const restaurantList = this.restaurantList.nativeElement;
+    restaurantList.classList.add('hidden');
+  }
+
+  selectRestaurant(restaurant: Restaurant) {
+    this.selectedRestaurant = restaurant;
+    this.hideList();
+  }
+
+  preventClose(event: MouseEvent) {
+    event.stopPropagation();
+  }
+  
   public fillRestaurants() {
     this.restaurantService.getRestaurants().subscribe({
       next: (response: Restaurant[]) => {
@@ -39,7 +68,7 @@ export class RegisterComponent {
         response.forEach(r => {
           this.registerRestaurantsFormArray.push(new FormControl(r));
         });
-
+        console.log(this.restaurants);
         this.restaurants.length = 0;
         response.forEach(r => {
           this.restaurants.push(r);
