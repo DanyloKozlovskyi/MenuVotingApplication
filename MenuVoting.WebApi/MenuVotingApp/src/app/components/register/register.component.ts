@@ -1,4 +1,4 @@
-import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, Renderer2, ViewChild, AfterViewInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from 'src/app/services/account/account.service';
@@ -15,7 +15,7 @@ import { RestaurantService } from 'src/app/services/restaurant/restaurant.servic
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
-export class RegisterComponent {
+export class RegisterComponent implements AfterViewInit {
   registerForm: FormGroup;
   isRegisterFormSubmitted: boolean = false;
   isRegisterValid: boolean = true;
@@ -23,9 +23,9 @@ export class RegisterComponent {
   selectedRestaurant: Restaurant | null = null;
 
   constructor(private accountService: AccountService, private restaurantService: RestaurantService, private router: Router, private renderer: Renderer2) {
-    this.renderer.listen('document', 'click', () => {
-      this.hideList();
-    });
+    //this.renderer.listen('document', 'click', () => {
+    //  this.hideList();
+    //});
 
     this.registerForm = new FormGroup({
       personName: new FormControl(null, [Validators.required]),
@@ -33,9 +33,16 @@ export class RegisterComponent {
       phoneNumber: new FormControl(null, [Validators.required]),
       password: new FormControl(null, [Validators.required]),
       confirmPassword: new FormControl(null, [Validators.required]),
-      restaurants: new FormArray([])
+      restaurants: new FormArray([]),
+      restaurantId: new FormControl(null, [Validators.required])
     });
     this.fillRestaurants();
+  }
+
+  ngAfterViewInit() {
+    this.renderer.listen('document', 'click', () => {
+      this.hideList();
+    });
   }
 
   @ViewChild('restaurantList', { static: false }) restaurantList!: ElementRef;
@@ -54,6 +61,9 @@ export class RegisterComponent {
 
   selectRestaurant(restaurant: Restaurant) {
     this.selectedRestaurant = restaurant;
+    this.restaurantInput.nativeElement.value = restaurant.name + " " + restaurant.address;
+    // to use setValue() explicitly cast object to FormControl
+    this.registerRestaurantIdControl.setValue(restaurant.id);
     this.hideList();
   }
 
@@ -83,29 +93,35 @@ export class RegisterComponent {
     });
   }
 
-  get registerNameControl(): any {
-    return this.registerForm.controls['personName'];
+  get registerNameControl(): FormControl {
+    return this.registerForm.controls['personName'] as FormControl;
   }
-  get registerEmailControl(): any {
-    return this.registerForm.controls['email'];
+  get registerEmailControl(): FormControl {
+    return this.registerForm.controls['email'] as FormControl;
   }
-  get registerPhoneControl(): any {
-    return this.registerForm.controls['phoneNumber'];
+  get registerPhoneControl(): FormControl {
+    return this.registerForm.controls['phoneNumber'] as FormControl;
   }
-  get registerPasswordControl(): any {
-    return this.registerForm.controls['password'];
+  get registerPasswordControl(): FormControl {
+    return this.registerForm.controls['password'] as FormControl;
   }
-  get registerConfirmPasswordControl(): any {
-    return this.registerForm.controls['confirmPassword'];
+  get registerConfirmPasswordControl(): FormControl {
+    return this.registerForm.controls['confirmPassword'] as FormControl;
   }
   get registerRestaurantsFormArray(): FormArray {
     return this.registerForm.get("restaurants") as FormArray;
   }
+  get registerRestaurantIdControl(): FormControl {
+    return this.registerForm.controls['restaurantId'] as FormControl;
+  }
+
 
   registerSubmitted() {
     this.isRegisterFormSubmitted = true;
+    console.log('registerSubmitted');
+    console.log(this.registerRestaurantIdControl);
     if (this.registerForm.valid) {
-
+      console.log(this.registerForm.value);
       this.accountService.postRegister(this.registerForm.value).subscribe({
         next: (response: any) => {
           this.isRegisterValid = true;
@@ -115,7 +131,7 @@ export class RegisterComponent {
           localStorage["token"] = response.token;
           localStorage["refreshToken"] = response.refreshToken;
 
-          this.router.navigate(['/system']);
+          this.router.navigate(['/menu-voting']);
 
           this.registerForm.reset();
         },

@@ -46,7 +46,7 @@ export class LoginComponent {
           localStorage["token"] = response.token;
           localStorage["refreshToken"] = response.refreshToken;
 
-          this.router.navigate(['/system']);
+          this.router.navigate(['/menu-voting']);
 
           this.loginForm.reset();
 
