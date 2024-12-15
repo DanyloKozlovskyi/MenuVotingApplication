@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 
 namespace MenuVoting.DataAccess.Models
 {
-	public class MenuPool
-	{
-		public Guid Id { get; set; }
-		[ForeignKey(nameof(MenuVoting.DataAccess.Models.Restaurant))]
-		public Guid RestaurantId { get; set; }
-		virtual public Restaurant? Restaurant { get; set; }
-		virtual public ICollection<Menu>? Menus { get; set; }
-	}
+    public class MenuPool
+    {
+        public Guid Id { get; set; }
+        [ForeignKey(nameof(MenuVoting.DataAccess.Models.Restaurant))]
+        public Guid RestaurantId { get; set; }
+        virtual public Restaurant? Restaurant { get; set; }
+        virtual public ICollection<Menu>? Menus { get; set; }
+        public DateTime Date { get; set; }
+    }
 }
