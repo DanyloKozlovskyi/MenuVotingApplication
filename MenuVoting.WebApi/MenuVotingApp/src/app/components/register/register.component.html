@@ -20,7 +20,6 @@
       <!-- Email -->
       <div class="form-field flex">
         <div class="w-25">
-
           <label for="email" class="form-label pt">Email</label>
         </div>
 
@@ -35,13 +34,11 @@
       <!-- Phone Number -->
       <div class="form-field flex">
         <div class="w-25">
-
           <label for="phone" class="form-label pt">Phone Number</label>
         </div>
         <div class="flex-1">
           <input type="text" id="phone" class="form-input" formControlName="phoneNumber" />
           <span class="text-red" *ngIf="(registerPhoneControl.touched || isRegisterFormSubmitted) && (registerPhoneControl.errors?.['required'])">Phone Number can't be blank</span>
-
         </div>
       </div>
 
@@ -60,7 +57,6 @@
       <!-- Password -->
       <div class="form-field flex">
         <div class="w-25">
-
           <label for="password" class="form-label pt">Password</label>
         </div>
         <div class="flex-1">
@@ -73,7 +69,6 @@
       <!-- Confirm Password -->
       <div class="form-field flex">
         <div class="w-25">
-
           <label for="confirmPassword" class="form-label pt">Confirm Password</label>
         </div>
         <div class="flex-1">
@@ -99,38 +94,4 @@
 </div>
 
 <script>
-  console.log(1);
-  document.addEventListener('DOMContentLoaded', () => {
-    const restaurantInput = document.getElementById('restaurantInput');
-    const restaurantList = document.getElementById('restaurantList');
-    const restaurantOptions = restaurantList.getElementById('option');
-
-    // Show the list when the input is focused
-    restaurantInput.addEventListener('focus', () => {
-      restaurantList.classList.remove('hidden');
-    });
-
-    // Hide the list if clicking outside the input or the list
-    document.addEventListener('click', (event) => {
-      if (!restaurantInput.contains(event.target) && !restaurantList.contains(event.target)) {
-        restaurantList.classList.add('hidden');
-      }
-    });
-
-    // When a user clicks on a restaurant option
-    Array.from(restaurantOptions).forEach(option => {
-      option.addEventListener('click', () => {
-        // Get the name and address data from the option
-        const value = option.getAttribute('value');
-        const name = value.split(', ')[0];
-        const address = value.split(', ')[1];
-
-        // Set the input field with the selected restaurant info
-        restaurantInput.value = `${name}, ${address}`;
-
-        // Hide the list after selection
-        restaurantList.classList.add('hidden');
-      });
-    });
-  });
 </script>
