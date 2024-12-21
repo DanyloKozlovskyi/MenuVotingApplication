@@ -20,7 +20,7 @@ namespace MenuVoting.DataAccess.Models.SeedRoles
             {
                 var roleExists = await roleManager.RoleExistsAsync(role);
 
-                if (roleExists)
+                if (!roleExists)
                 {
                     await roleManager.CreateAsync(new ApplicationRole() { Name = role });
                 }
