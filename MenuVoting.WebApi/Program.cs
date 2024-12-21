@@ -1,5 +1,6 @@
 using MenuVoting.DataAccess;
 using MenuVoting.DataAccess.Identity;
+using MenuVoting.DataAccess.Models.SeedRoles;
 using MenuVoting.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -31,9 +32,9 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
 }).AddEntityFrameworkStores<MenuVotingDbContext>()
-.AddDefaultTokenProviders()
 .AddUserStore<UserStore<ApplicationUser, ApplicationRole, MenuVotingDbContext, Guid>>()
-.AddRoleStore<RoleStore<ApplicationRole, MenuVotingDbContext, Guid>>();
+.AddRoleStore<RoleStore<ApplicationRole, MenuVotingDbContext, Guid>>()
+.AddDefaultTokenProviders();
 
 //JWT server-side authentication
 builder.Services.AddAuthentication(options =>
@@ -101,6 +102,12 @@ if (app.Environment.IsDevelopment())
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "1.0");
     });
+}
+
+
+using (var scope = app.Services.CreateScope())
+{
+    await RoleInitializer.Initialize(scope.ServiceProvider);
 }
 
 app.Run();

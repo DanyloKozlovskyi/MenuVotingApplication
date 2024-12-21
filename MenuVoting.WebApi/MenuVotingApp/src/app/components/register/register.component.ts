@@ -63,6 +63,7 @@ export class RegisterComponent implements AfterViewInit {
     this.selectedRestaurant = restaurant;
     this.restaurantInput.nativeElement.value = restaurant.name + " " + restaurant.address;
     // to use setValue() explicitly cast object to FormControl
+    console.log(restaurant.id + ' was set');
     this.registerRestaurantIdControl.setValue(restaurant.id);
     this.hideList();
   }
@@ -120,12 +121,13 @@ export class RegisterComponent implements AfterViewInit {
     this.isRegisterFormSubmitted = true;
     console.log('registerSubmitted');
     console.log(this.registerRestaurantIdControl);
+    console.log(this.registerForm);
     if (this.registerForm.valid) {
       console.log(this.registerForm.value);
       this.accountService.postRegister(this.registerForm.value).subscribe({
         next: (response: any) => {
           this.isRegisterValid = true;
-
+          console.log('correct response');
           this.accountService.currentUserName = response.email;
           this.isRegisterFormSubmitted = false;
           localStorage["token"] = response.token;
@@ -136,6 +138,7 @@ export class RegisterComponent implements AfterViewInit {
           this.registerForm.reset();
         },
         error: (error: any) => {
+          console.log('incorrect response');
           this.isRegisterValid = false;
           console.log(error);
         },
