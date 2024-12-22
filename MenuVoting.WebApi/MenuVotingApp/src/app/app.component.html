@@ -32,6 +32,9 @@
         <li>
           <a [routerLink]="[ '/menu-voting' ]" [routerLinkActive]="['nav-active']">menu-voting</a>
         </li>
+        <li *ngIf="accountService.isAdmin">
+          <a [routerLink]="[ '/menu-pool' ]" [routerLinkActive] = "['nav-active']">menu-pool</a>
+        </li>
       </ul>
     </div>
     <div class="body">

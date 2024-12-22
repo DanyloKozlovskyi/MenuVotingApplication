@@ -107,7 +107,14 @@ if (app.Environment.IsDevelopment())
 
 using (var scope = app.Services.CreateScope())
 {
-    await RoleInitializer.Initialize(scope.ServiceProvider);
+    try
+    {
+        await RoleInitializer.SeedRoles(scope.ServiceProvider);
+    }
+    catch (Exception exc)
+    {
+        Console.WriteLine(exc);
+    }
 }
 
 app.Run();

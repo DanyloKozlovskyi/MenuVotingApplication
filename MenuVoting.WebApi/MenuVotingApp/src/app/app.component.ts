@@ -20,8 +20,8 @@ export class AppComponent {
   logOutClicked() {
     this.accountService.getLogout().subscribe({
       next: (response: string) => {
-        console.log(response);
         this.accountService.currentUserName = null;
+        this.accountService.isAdmin = false;
 
         localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
