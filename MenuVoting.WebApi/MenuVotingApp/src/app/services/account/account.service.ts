@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { RegisterUser } from 'src/app/models/register-user';
 import { Observable } from 'rxjs';
 import { LoginUser } from 'src/app/models/login-user';
+import { jwtDecode } from 'jwt-decode';
 
 const API_BASE_URL: string = "https://localhost:7294/api/account/";
 
@@ -11,7 +12,19 @@ const API_BASE_URL: string = "https://localhost:7294/api/account/";
 })
 export class AccountService {
   currentUserName: string | null = null;
+  isAdmin: boolean = false;
   constructor(private httpClient: HttpClient) { }
+
+  setUserRole(token: string | null) {
+    if (token != null) {
+      const decodedToken = jwtDecode<{ [key: string]: any }>(token);
+      const role = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      console.log(token);
+      console.log(decodedToken);
+      console.log(role);
+      this.isAdmin = role === 'Admin';
+    }
+  }
 
   public postRegister(registerUser: RegisterUser): Observable<any> {
     return this.httpClient.post<any>(`${API_BASE_URL}register`, registerUser);

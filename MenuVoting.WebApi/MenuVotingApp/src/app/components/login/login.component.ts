@@ -38,13 +38,13 @@ export class LoginComponent {
 
       this.accountService.postLogin(this.loginForm.value).subscribe({
         next: (response: any) => {
-          console.log(response);
           this.isLoginValid = true;
 
           this.accountService.currentUserName = response.email;
           this.isLoginFormSubmitted = false;
           localStorage["token"] = response.token;
           localStorage["refreshToken"] = response.refreshToken;
+          this.accountService.setUserRole(localStorage['token']);
 
           this.router.navigate(['/menu-voting']);
 

@@ -14,13 +14,11 @@ export class RestaurantService {
 
   }
   public getRestaurants(): Observable<Restaurant[]> {
-    console.log("Get Restaurants " + "localStorage['token']: " + localStorage['token']);
     let headers = new HttpHeaders();
     headers = headers.set("Authorization", `Bearer ${localStorage['token']}`);
     return this.httpClient.get<Restaurant[]>(`${API_BASE_URL}restaurants`, { headers: headers });
   }
   public postRestaurant(Restaurant: Restaurant): Observable<string | null> {
-    //console.log(Restaurant);
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
     return this.httpClient.post<string | null>(`${API_BASE_URL}restaurants`, Restaurant, { headers: headers });
