@@ -9,96 +9,119 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MenuVoting.WebApi.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
-	[Authorize]
-	public class MenuVotingsController : ControllerBase
-	{
-		private readonly IMenuVotingsService menuVotingService;
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class MenuVotingsController : ControllerBase
+    {
+        private readonly IMenuVotingsService menuVotingService;
 
-		public MenuVotingsController(IMenuVotingsService service)
-		{
-			menuVotingService = service;
-		}
+        public MenuVotingsController(IMenuVotingsService service)
+        {
+            menuVotingService = service;
+        }
 
-		// GET: api/MenuPools
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<MenuPool>>> GetMenuPools()
-		{
-			var menuPools = await menuVotingService.GetMenuPools();
-			return Ok(menuPools);
-		}
+        // GET: api/MenuPools/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<MenuPool>> GetMenuPool(Guid id)
+        {
+            var menuPool = await menuVotingService.GetMenuPoolById(id);
 
-		// GET: api/MenuPools/5
-		[HttpGet("{id}")]
-		public async Task<ActionResult<MenuPool>> GetMenuPool(Guid id)
-		{
-			var menuPool = await menuVotingService.GetMenuPoolById(id);
+            if (menuPool == null)
+            {
+                return NotFound();
+            }
 
-			if (menuPool == null)
-			{
-				return NotFound();
-			}
+            return Ok(menuPool);
+        }
 
-			return Ok(menuPool);
-		}
+        [HttpGet("current")]
+        public async Task<ActionResult<MenuPool>> GetCurrentMenuPool()
+        {
+            var restaurantId = Guid.Parse(User.FindFirstValue("Organization"));
 
-		// PUT: api/MenuPools/5
-		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-		[HttpPut("{id}")]
-		public async Task<IActionResult> PutMenuPool(Guid id, MenuPool menuPool)
-		{
-			if (id != menuPool.Id)
-			{
-				return BadRequest();
-			}
+            var menuPool = await menuVotingService.CurrentMenuPool(restaurantId);
 
-			bool result = await menuVotingService.UpdateMenuPool(id, menuPool);
+            if (menuPool == null)
+            {
+                return NotFound();
+            }
 
-			return Ok(result);
-		}
+            return Ok(menuPool);
+        }
 
-		// POST: api/MenuPools
-		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-		[HttpPost]
-		public async Task<ActionResult<MenuPool>> PostMenuPool(MenuPool menuPool)
-		{
-			await menuVotingService.CreateMenuPool(menuPool);
+        // PUT: api/MenuPools/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutMenuPool(Guid id, MenuPool menuPool)
+        {
+            if (id != menuPool.Id)
+            {
+                return BadRequest();
+            }
 
-			return CreatedAtAction("GetMenuPool", new { id = menuPool.Id });
-		}
+            bool result = await menuVotingService.UpdateMenuPool(id, menuPool);
 
-		[HttpPost("menu")]
-		public async Task<ActionResult<MenuPool>> PostMenu(MenuCreate menuCreate)
-		{
-			Menu menu = await menuVotingService.CreateMenu(menuCreate);
+            return Ok(result);
+        }
 
-			return CreatedAtAction("GetMenuPool", new { id = menu.Id });
-		}
+        // POST: api/MenuPools
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<MenuPool>> PostMenuPool(MenuPoolCreate menuPoolCreate)
+        {
+            var menuPool = await menuVotingService.CreateMenuPool(menuPoolCreate);
 
-		[HttpPost("vote")]
-		public async Task<ActionResult<MenuPool>> PostVote(VoteCreate voteCreate)
-		{
-			Vote vote = await menuVotingService.CreateVote(voteCreate);
+            return CreatedAtAction("GetMenuPool", new { id = menuPool.Id });
+        }
 
-			return CreatedAtAction("GetMenuPool", new { id = vote.Id });
-		}
+        [HttpPost("{id}/menu")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<MenuPool>> AddMenuToMenuPool(Guid id, MenuCreate menuCreate)
+        {
+            Menu menu = await menuVotingService.CreateMenu(menuCreate);
 
-		// DELETE: api/MenuPools/5
-		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeleteMenuPool(Guid id)
-		{
-			bool deleteSucceeded = await menuVotingService.DeleteMenuPool(id);
-			if (!deleteSucceeded)
-			{
-				return NotFound();
-			}
+            return CreatedAtAction("GetMenuPool", new { id });
+        }
 
-			return Ok(deleteSucceeded);
-		}
-	}
+        [HttpPost("vote")]
+        public async Task<ActionResult<MenuPool>> PostVote(VoteCreate voteCreate)
+        {
+            Vote vote = await menuVotingService.CreateVote(voteCreate);
+
+            return CreatedAtAction("GetMenuPool", new { id = vote.Id });
+        }
+
+        // DELETE: api/MenuPools/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMenuPool(Guid id)
+        {
+            bool deleteSucceeded = await menuVotingService.DeleteMenuPool(id);
+            if (!deleteSucceeded)
+            {
+                return NotFound();
+            }
+
+            return Ok(deleteSucceeded);
+        }
+
+        // DELETE: api/MenuPools/5
+        [HttpDelete("menu/{id}")]
+        public async Task<IActionResult> DeleteMenu(Guid id)
+        {
+            bool deleteSucceeded = await menuVotingService.DeleteMenu(id);
+            if (!deleteSucceeded)
+            {
+                return NotFound();
+            }
+
+            return Ok(deleteSucceeded);
+        }
+    }
 }

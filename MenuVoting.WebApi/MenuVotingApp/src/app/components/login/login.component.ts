@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RegisterUser } from 'src/app/models/register-user';
+import { RegisterUser } from 'src/app/models/register-user/register-user';
 import { AccountService } from 'src/app/services/account/account.service';
-import { LoginUser } from 'src/app/models/login-user';
+import { LoginUser } from 'src/app/models/login-user/login-user';
 
 @Component({
   selector: 'app-login',

@@ -2,9 +2,9 @@ import { Component, ElementRef, Renderer2, ViewChild, AfterViewInit } from '@ang
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from 'src/app/services/account/account.service';
-import { RegisterUser } from 'src/app/models/register-user';
+import { RegisterUser } from 'src/app/models/register-user/register-user';
 import { CommonModule } from '@angular/common';
-import { Restaurant } from 'src/app/models/restaurant';
+import { Restaurant } from 'src/app/models/restaurant/restaurant';
 import { RestaurantService } from 'src/app/services/restaurant/restaurant.service';
 
 

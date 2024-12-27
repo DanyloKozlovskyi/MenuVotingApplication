@@ -39,6 +39,7 @@ namespace MenuVoting.WebApi.Services
                     new Claim(ClaimTypes.Name, user.PersonName),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User"),
+                    new Claim("Organization", user.RestaurantId.ToString())
                 };
 
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
