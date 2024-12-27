@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Restaurant } from "src/app/models/restaurant";
+import { Restaurant } from "src/app/models/restaurant/restaurant";
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from "rxjs";
 

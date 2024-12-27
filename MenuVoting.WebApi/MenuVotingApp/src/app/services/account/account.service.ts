@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { RegisterUser } from 'src/app/models/register-user';
+import { RegisterUser } from 'src/app/models/register-user/register-user';
 import { Observable } from 'rxjs';
-import { LoginUser } from 'src/app/models/login-user';
+import { LoginUser } from 'src/app/models/login-user/login-user';
 import { jwtDecode } from 'jwt-decode';
 
 const API_BASE_URL: string = "https://localhost:7294/api/account/";

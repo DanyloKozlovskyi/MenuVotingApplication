@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <Folder Include="MenuVotingApp\src\app\components\" />
-    <Folder Include="MenuVotingApp\src\app\models\" />
     <Folder Include="MenuVotingApp\src\app\services\" />
   </ItemGroup>
 

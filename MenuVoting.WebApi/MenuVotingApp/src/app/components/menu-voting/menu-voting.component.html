@@ -1,1 +1,91 @@
-<p>menu-voting works!</p>
+<div class="flex">
+  <!-- left box begins-->
+
+  <div class="flex-1">
+    <div class="table-container">
+      <table class="table w-100" [formGroup]="putMenuForm">
+
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Menu Pool</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody formArrayName="menupool">
+          <tr [formGroupName]="i" *ngFor="let menu of menus; let i = index" class="table-row-left">
+            <td style="width:5%">{{i+1}}</td>
+
+            <td formArrayName="parameters" *ngFor="let row of putMenuPool_MenusControl(i).controls; let j = index" class="table-data-6">
+              <div *ngIf="j !== 0">
+                <span type="text" class="form-span-parameter">{{row.value.value}}</span>
+                <span class="text-grey flex-text-x">x</span>
+                <sup class="text-grey flex-text" *ngIf="j !== 1">{{j}}</sup>
+                <span class="text-grey flex-text" *ngIf="j != putMenuPool_MenusControl(i).length - 1">+</span>
+              </div>
+              <div *ngIf="j === 0">
+                <span type="text" class="form-span-parameter">{{row.value.value}}</span>
+                <span class="text-grey flex-text">+</span>
+              </div>
+            </td>
+            <!--it was 200px there-->
+            <td style="width:50px" *ngIf="accountService.isAdmin">
+              <button class="button button-red-back ml" (click)="deleteClicked(menu, i)" *ngIf="menu.id != editId" type="button">Delete</button>
+              <button class="button button-blue-back ml" (click)="editClicked(menu)" *ngIf="menu.id != editId" type="button">Edit</button>
+
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+  <!--it was w-50 there-->
+  <div class="flex-1 w-50">
+    <div class="form-container">
+      <div class="table-container">
+
+        <table class="table" [formGroup]="postMenuForm">
+
+          <thead>
+            <tr>
+              <th>Enter dish</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr formArrayName="dishes" class="table-row">
+              <td *ngFor="let row of postDishesFormArray.controls; let i = index" [ngClass]="{'table-data-2': rows === 2, 'table-data-3': rows === 3,
+             'table-data-4': rows === 4, 'table-data-5': rows === 5, 'table-data-6': rows === 6 }">
+                <div *ngIf="i !== 0" [formGroupName]="i">
+                  <input type="text" formControlName="value" class="form-input-parameter" value="{{row}}" />
+                  <span class="text-grey flex-text-x">x</span>
+                  <sup class="text-grey flex-text" *ngIf="i !== 1">{{i}}</sup>
+                  <span class="text-grey flex-text" *ngIf="i != rows - 1">+</span>
+                </div>
+                <div *ngIf="i === 0" [formGroupName]="i">
+                  <input type="text" formControlName="value" class="form-input-parameter" value="{{row}}" />
+                  <span class="text-grey flex-text">+</span>
+                </div>
+              </td>
+            </tr>
+
+            <tr class="table-row">
+              <td style="width:200px">
+                <button class="button button-blue-back" (click)="postMenuSubmitted()">
+                  Solve
+                </button>
+              </td>
+              <td>
+                <span class="text-red" *ngIf="!isInputValid && isPostMenuFormSubmitted">Incorrect input</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- right box ends-->
+
+</div>

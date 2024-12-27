@@ -14,6 +14,6 @@ namespace MenuVoting.DataAccess.Models
         public Guid RestaurantId { get; set; }
         virtual public Restaurant? Restaurant { get; set; }
         virtual public ICollection<Menu>? Menus { get; set; }
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
     }
 }
