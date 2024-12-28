@@ -55,10 +55,9 @@ namespace MenuVoting.WebApi.Services
                 );
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            string token = null;
 
             //possible error here if key size is less than 256 bytes 
-            token = tokenHandler.WriteToken(tokenGenerator);
+            string token = tokenHandler.WriteToken(tokenGenerator);
 
             Console.WriteLine(Convert.ToInt32(configuration["Jwt:EXPIRATION_MINUTES"]));
 

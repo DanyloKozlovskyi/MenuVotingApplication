@@ -19,10 +19,12 @@ export class MenuVotingService {
     headers = headers.set("Authorization", `Bearer ${localStorage['token']}`);
     return this.httpClient.get<MenuPool>(`${API_BASE_URL}menuvotings/current`, { headers: headers });
   }
-  public createMenuPool(): Observable<string | null> {
+
+  public createMenuPool(menuPool: MenuPool): Observable<MenuPool> {
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
-    return this.httpClient.post<string | null>(`${API_BASE_URL}menuvotings`, { headers: headers });
+    console.log('createMenuPool: ' + localStorage['token']);
+    return this.httpClient.post<MenuPool>(`${API_BASE_URL}menuvotings`, menuPool, { headers: headers });
   }
 
   public putMenuPool(menuPool: MenuPool): Observable<string> {

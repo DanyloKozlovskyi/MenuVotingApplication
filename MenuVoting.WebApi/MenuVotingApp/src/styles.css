@@ -897,3 +897,9 @@ a.button-link:link, a.button-link:visited {
 .hidden {
   display: none;
 }
+
+.row-justify-center {
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+}

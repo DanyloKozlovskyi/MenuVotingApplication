@@ -27,6 +27,7 @@ export class MenuVotingComponent {
   menus: Menu[] = [];
   putMenuForm: FormGroup;
   loading: boolean = false;
+  isCurrentMenuPoolCreated: boolean = false;
 
   isInputValid: boolean = true;
 
@@ -57,7 +58,24 @@ export class MenuVotingComponent {
     return this.postDishesForm.get("dishes") as FormArray;
   }
 
-  public async postMenuSubmitted() {
+  public createMenuPoolSubmitted() {
+    const menuPool = new MenuPool(null, [], this.accountService.restaurantId)
+    this.menuVotingService.createMenuPool(menuPool).subscribe({
+      next: (response: MenuPool) => {
+        this.isInputValid = true;
+        this.isCurrentMenuPoolCreated = true;
+      },
+
+      error: (error: any) => {
+        console.log(error);
+        this.isInputValid = false;
+        this.isCurrentMenuPoolCreated = false;
+      },
+      complete: () => { }
+    });
+  }
+
+  public postMenuSubmitted() {
     this.isPostMenuFormSubmitted = true;
     this.dishes = [];
     this.loading = true;
@@ -122,10 +140,12 @@ export class MenuVotingComponent {
         var parameters = [];
         this.putMenuFormArray.clear();
 
+        this.isCurrentMenuPoolCreated = true;
+
         this.menus.forEach(menu => {
           this.putMenuFormArray.push(new FormGroup({
             id: new FormControl(menu.id, [Validators.required]),
-            parameters: new FormArray([]),
+            dishes: new FormArray([]),
           }));
         });
 
@@ -138,6 +158,7 @@ export class MenuVotingComponent {
 
       error: (error: any) => {
         console.log(error);
+        this.isCurrentMenuPoolCreated = false;
       },
 
       complete: () => { }
