@@ -48,10 +48,10 @@ export class MenuVotingService {
     return this.httpClient.delete<string>(`${API_BASE_URL}menuvotings/menu/${id}`, { headers: headers });
   }
 
-  public postMenu(menu: Menu): Observable<Menu> {
+  public postMenu(menupoolId: string | null, menu: Menu): Observable<Menu> {
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
-
-    return this.httpClient.post<Menu>(`${API_BASE_URL}menuvotings/menu`, menu, { headers: headers });
+    console.log(menu);
+    return this.httpClient.post<Menu>(`${API_BASE_URL}menuvotings/${menupoolId}/menu`, menu, { headers: headers });
   }
 }

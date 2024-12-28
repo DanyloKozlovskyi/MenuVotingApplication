@@ -116,9 +116,8 @@ namespace MenuVoting.WebApi.Services
 
         public async Task<MenuPool?> CurrentMenuPool(Guid restaurantId)
         {
-            return await dbContext.MenuPools.FirstOrDefaultAsync(x => x.RestaurantId == restaurantId && x.Date == DateOnly.FromDateTime(DateTime.UtcNow));
+            return await dbContext.MenuPools.Include(x => x.Menus).FirstOrDefaultAsync(x => x.RestaurantId == restaurantId && x.Date == DateOnly.FromDateTime(DateTime.UtcNow));
         }
-
 
         private bool MenuPoolExists(Guid id)
         {

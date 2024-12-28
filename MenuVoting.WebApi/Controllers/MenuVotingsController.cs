@@ -58,6 +58,7 @@ namespace MenuVoting.WebApi.Controllers
         // PUT: api/MenuPools/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutMenuPool(Guid id, MenuPool menuPool)
         {
             if (id != menuPool.Id)
@@ -85,6 +86,7 @@ namespace MenuVoting.WebApi.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<MenuPool>> AddMenuToMenuPool(Guid id, MenuCreate menuCreate)
         {
+            menuCreate.MenuPoolId = id;
             Menu menu = await menuVotingService.CreateMenu(menuCreate);
 
             return CreatedAtAction("GetMenuPool", new { id });
@@ -99,6 +101,7 @@ namespace MenuVoting.WebApi.Controllers
         }
 
         // DELETE: api/MenuPools/5
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMenuPool(Guid id)
         {
@@ -112,6 +115,7 @@ namespace MenuVoting.WebApi.Controllers
         }
 
         // DELETE: api/MenuPools/5
+        [Authorize(Roles = "Admin")]
         [HttpDelete("menu/{id}")]
         public async Task<IActionResult> DeleteMenu(Guid id)
         {

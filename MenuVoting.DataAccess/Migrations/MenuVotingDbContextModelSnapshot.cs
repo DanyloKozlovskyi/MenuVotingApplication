@@ -137,8 +137,8 @@ namespace MenuVoting.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string[]>("Dishes")
-                        .HasColumnType("text[]");
+                    b.Property<string>("Dishes")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("MenuPoolId")
                         .HasColumnType("uuid");
