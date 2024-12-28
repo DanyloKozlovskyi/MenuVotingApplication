@@ -3,7 +3,27 @@
 
   <div class="flex-1">
     <div class="table-container">
-      <table class="table w-100" [formGroup]="putMenuForm">
+      <table class="table" [formGroup]="putMenuForm" *ngIf="!isCurrentMenuPoolCreated">
+
+        <thead>
+          <tr>
+            <th>Create Menu Pool</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr class="table-row row-justify-center">
+            <td style="width:200px">
+              <button class="button button-blue-back" (click)="createMenuPoolSubmitted()">
+                Create
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <table class="table w-100" [formGroup]="putMenuForm" *ngIf="isCurrentMenuPoolCreated">
 
         <thead>
           <tr>
@@ -46,7 +66,7 @@
     <div class="form-container">
       <div class="table-container">
 
-        <table class="table" [formGroup]="postMenuForm">
+        <table class="table" [formGroup]="postMenuForm" *ngIf="isCurrentMenuPoolCreated">
 
           <thead>
             <tr>

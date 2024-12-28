@@ -49,7 +49,7 @@ namespace MenuVoting.WebApi.Controllers
 
             if (menuPool == null)
             {
-                return NotFound();
+                return Problem();
             }
 
             return Ok(menuPool);
