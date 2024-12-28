@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MenuVoting.DataAccess.Migrations
 {
     [DbContext(typeof(MenuVotingDbContext))]
-    [Migration("20241221211323_addedIsAdminApplicationUser")]
-    partial class addedIsAdminApplicationUser
+    [Migration("20241228171226_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,7 +140,7 @@ namespace MenuVoting.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string[]>("Components")
+                    b.Property<string[]>("Dishes")
                         .HasColumnType("text[]");
 
                     b.Property<Guid>("MenuPoolId")
@@ -159,8 +159,8 @@ namespace MenuVoting.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<Guid>("RestaurantId")
                         .HasColumnType("uuid");

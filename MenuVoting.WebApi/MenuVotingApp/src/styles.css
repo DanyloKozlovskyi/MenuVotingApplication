@@ -827,7 +827,7 @@ a.button-link:link, a.button-link:visited {
   border-radius: 8px;
   border: 1px solid #d0d0d0;
   transition: box-shadow 0.2s;
-  width: 40px;
+  width: 100px;
 }
 
   .form-input-parameter:focus {

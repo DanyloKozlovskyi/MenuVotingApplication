@@ -37,16 +37,14 @@
           <tr [formGroupName]="i" *ngFor="let menu of menus; let i = index" class="table-row-left">
             <td style="width:5%">{{i+1}}</td>
 
-            <td formArrayName="parameters" *ngFor="let row of putMenuPool_MenusControl(i).controls; let j = index" class="table-data-6">
+            <td formArrayName="dishes" *ngFor="let row of putMenuPool_MenusControl(i).controls; let j = index" class="table-data-6">
               <div *ngIf="j !== 0">
                 <span type="text" class="form-span-parameter">{{row.value.value}}</span>
-                <span class="text-grey flex-text-x">x</span>
-                <sup class="text-grey flex-text" *ngIf="j !== 1">{{j}}</sup>
-                <span class="text-grey flex-text" *ngIf="j != putMenuPool_MenusControl(i).length - 1">+</span>
+                <span class="text-grey flex-text" *ngIf="j != putMenuPool_MenusControl(i).length - 1">, </span>
               </div>
               <div *ngIf="j === 0">
                 <span type="text" class="form-span-parameter">{{row.value.value}}</span>
-                <span class="text-grey flex-text">+</span>
+                <span class="text-grey flex-text" *ngIf="j != putMenuPool_MenusControl(i).length - 1">, </span>
               </div>
             </td>
             <!--it was 200px there-->
@@ -63,11 +61,17 @@
   </div>
   <!--it was w-50 there-->
   <div class="flex-1 w-50">
-    <div class="form-container">
+    <div class="form-container" *ngIf="isCurrentMenuPoolCreated">
+      <form [formGroup]="postRowsForm">
+        <select id="rows" formControlName="rows" (change)="resizePostForm()">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected="selected">3</option>
+          <option value="4">4</option>
+        </select>
+      </form>
       <div class="table-container">
-
-        <table class="table" [formGroup]="postMenuForm" *ngIf="isCurrentMenuPoolCreated">
-
+        <table class="table" [formGroup]="postMenuForm">
           <thead>
             <tr>
               <th>Enter dish</th>
@@ -80,13 +84,11 @@
              'table-data-4': rows === 4, 'table-data-5': rows === 5, 'table-data-6': rows === 6 }">
                 <div *ngIf="i !== 0" [formGroupName]="i">
                   <input type="text" formControlName="value" class="form-input-parameter" value="{{row}}" />
-                  <span class="text-grey flex-text-x">x</span>
-                  <sup class="text-grey flex-text" *ngIf="i !== 1">{{i}}</sup>
-                  <span class="text-grey flex-text" *ngIf="i != rows - 1">+</span>
+                  <span class="text-grey flex-text-x" *ngIf="i !== rows - 1">, </span>
                 </div>
                 <div *ngIf="i === 0" [formGroupName]="i">
                   <input type="text" formControlName="value" class="form-input-parameter" value="{{row}}" />
-                  <span class="text-grey flex-text">+</span>
+                  <span class="text-grey flex-text" *ngIf="i !== rows - 1">, </span>
                 </div>
               </td>
             </tr>
@@ -94,7 +96,7 @@
             <tr class="table-row">
               <td style="width:200px">
                 <button class="button button-blue-back" (click)="postMenuSubmitted()">
-                  Solve
+                  Create
                 </button>
               </td>
               <td>

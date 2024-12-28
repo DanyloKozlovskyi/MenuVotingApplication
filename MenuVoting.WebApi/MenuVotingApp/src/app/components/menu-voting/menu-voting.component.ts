@@ -20,7 +20,6 @@ export class MenuVotingComponent {
   rows: number = 3;
   dishes: string[] = [];
   postMenuForm: FormGroup;
-  postDishesForm: FormGroup;
   isPostMenuFormSubmitted: boolean = false;
   postRowsForm: FormGroup;
   isPostDishesSubmitted: boolean = false;
@@ -28,18 +27,13 @@ export class MenuVotingComponent {
   putMenuForm: FormGroup;
   loading: boolean = false;
   isCurrentMenuPoolCreated: boolean = false;
-
   isInputValid: boolean = true;
-
   editId: string | null = null;
+  menupool: MenuPool = new MenuPool(null, [], null);
 
   constructor(private menuVotingService: MenuVotingService, public accountService: AccountService) {
     this.postMenuForm = new FormGroup({
       dishes: new FormArray([])
-    });
-
-    this.postDishesForm = new FormGroup({
-      dishes: new FormArray([]),
     });
 
     this.postRowsForm = new FormGroup({
@@ -55,7 +49,7 @@ export class MenuVotingComponent {
     return this.postRowsForm.controls['rows'];
   }
   get postDishesFormArray(): FormArray {
-    return this.postDishesForm.get("dishes") as FormArray;
+    return this.postMenuForm.get("dishes") as FormArray;
   }
 
   public createMenuPoolSubmitted() {
@@ -64,6 +58,7 @@ export class MenuVotingComponent {
       next: (response: MenuPool) => {
         this.isInputValid = true;
         this.isCurrentMenuPoolCreated = true;
+        this.menupool = response;
       },
 
       error: (error: any) => {
@@ -80,14 +75,12 @@ export class MenuVotingComponent {
     this.dishes = [];
     this.loading = true;
     this.isInputValid = true;
-
     for (let i = 0; i < this.postDishesFormArray.length; i++) {
       if (this.postDishesFormArray.at(i).invalid) {
         this.isInputValid = false;
         return;
       }
     }
-
     for (let i = 0; i < this.postDishesFormArray.length; i++) {
       let dish = this.postDishesFormArray.at(i).value.value as string;
       this.dishes.push(dish);
@@ -108,6 +101,7 @@ export class MenuVotingComponent {
       menuPoolId: new FormControl(menu.menuPoolId, [Validators.required]),
     }));
 
+    console.log(this.dishes);
     menu.dishes?.forEach((dish) => {
       this.putMenuPool_MenusControl(this.menus.length - 1).push(new FormGroup({
         value: new FormControl(dish, [Validators.required])
@@ -115,7 +109,7 @@ export class MenuVotingComponent {
     });
 
     //this.postSystemForm.value
-    this.menuVotingService.postMenu(menu).subscribe({
+    this.menuVotingService.postMenu(this.menupool.id, menu).subscribe({
       next: (response: Menu) => {
         this.isInputValid = true;
       },
@@ -136,8 +130,7 @@ export class MenuVotingComponent {
     this.menuVotingService.getCurrentMenuPool().subscribe({
       next: (response: MenuPool) => {
         this.menus = response.menus;
-
-        var parameters = [];
+        console.log(this.menus);
         this.putMenuFormArray.clear();
 
         this.isCurrentMenuPoolCreated = true;
@@ -150,9 +143,11 @@ export class MenuVotingComponent {
         });
 
         this.menus.forEach((menu: Menu, ind) => {
-          this.putMenuPool_MenusControl(ind).push(new FormGroup({
-            value: new FormControl(menu, [Validators.required])
-          }));
+          menu.dishes?.forEach((dish) => {
+            this.putMenuPool_MenusControl(ind).push(new FormGroup({
+              value: new FormControl(dish, [Validators.required])
+            }));
+          });
         });
       },
 
@@ -170,7 +165,7 @@ export class MenuVotingComponent {
 
   public putMenuPool_MenusControl(i: number): FormArray {
     let currentFormGroup = this.putMenuFormArray.controls[i] as FormGroup;
-    return currentFormGroup.controls['menupool'] as FormArray;
+    return currentFormGroup.controls['dishes'] as FormArray;
   }
 
   public editClicked(menu: Menu) {
@@ -193,5 +188,29 @@ export class MenuVotingComponent {
         complete: () => { }
       })
     }
+  }
+
+  public resizePostForm(): void {
+    this.rows = this.postRows_RowsControl.value;
+
+    //console.log(`start this.parameters: ${this.parameters}`);
+
+    if (this.dishes.length < this.rows) {
+      let length = this.dishes.length;
+      for (var i = length; i < this.rows; i++) {
+        this.dishes.push('');
+      }
+    }
+    else {
+      while (this.dishes.length != this.rows) {
+        this.dishes.pop();
+      }
+    }
+    this.postDishesFormArray.clear();
+    this.dishes.forEach((dish) => {
+      this.postDishesFormArray.push(new FormGroup({
+        value: new FormControl(dish, [Validators.required, Validators.pattern("^[a-zA-Z]+$")])
+      }));
+    });
   }
 }

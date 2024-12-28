@@ -25,7 +25,6 @@ namespace MenuVoting.WebApi.Services
         Task<Menu> CreateMenu(MenuCreate menuCreate);
 
         Task<MenuPool?> CurrentMenuPool(Guid restaurantId);
-
         Task<bool> DeleteMenu(Guid id);
     }
 }

@@ -8,17 +8,22 @@ using System.Threading.Tasks;
 
 namespace MenuVoting.DataAccess.Models.Configurations
 {
-	public class MenuConfiguration : IEntityTypeConfiguration<Menu>
-	{
-		public void Configure(EntityTypeBuilder<Menu> builder)
-		{
-			builder.HasKey(x => x.Id);
+    public class MenuConfiguration : IEntityTypeConfiguration<Menu>
+    {
+        public void Configure(EntityTypeBuilder<Menu> builder)
+        {
+            builder.HasKey(x => x.Id);
 
-			builder.HasOne(x => x.MenuPool)
-				.WithMany(x => x.Menus);
+            builder.Property(m => m.Dishes).HasConversion(
+                v => string.Join(',', v), // Convert List to CSV for storage
+                v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() // Convert CSV to List
+            );
 
-			builder.HasMany(x => x.Votes)
-				.WithOne(x => x.Menu);
-		}
-	}
+            builder.HasOne(x => x.MenuPool)
+                .WithMany(x => x.Menus);
+
+            builder.HasMany(x => x.Votes)
+                .WithOne(x => x.Menu);
+        }
+    }
 }
