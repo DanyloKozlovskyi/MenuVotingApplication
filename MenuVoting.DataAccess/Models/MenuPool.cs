@@ -13,7 +13,7 @@ namespace MenuVoting.DataAccess.Models
         [ForeignKey(nameof(MenuVoting.DataAccess.Models.Restaurant))]
         public Guid RestaurantId { get; set; }
         virtual public Restaurant? Restaurant { get; set; }
-        virtual public ICollection<Menu>? Menus { get; set; }
+        public ICollection<Menu>? Menus { get; set; }
         public DateOnly Date { get; set; }
     }
 }

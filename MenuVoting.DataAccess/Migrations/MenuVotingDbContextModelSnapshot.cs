@@ -147,7 +147,7 @@ namespace MenuVoting.DataAccess.Migrations
 
                     b.HasIndex("MenuPoolId");
 
-                    b.ToTable("Menus");
+                    b.ToTable("Menus", (string)null);
                 });
 
             modelBuilder.Entity("MenuVoting.DataAccess.Models.MenuPool", b =>
@@ -166,7 +166,7 @@ namespace MenuVoting.DataAccess.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("MenuPools");
+                    b.ToTable("MenuPools", (string)null);
                 });
 
             modelBuilder.Entity("MenuVoting.DataAccess.Models.Restaurant", b =>
@@ -185,7 +185,7 @@ namespace MenuVoting.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Restaurants");
+                    b.ToTable("Restaurants", (string)null);
 
                     b.HasData(
                         new
@@ -226,7 +226,7 @@ namespace MenuVoting.DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Votes");
+                    b.ToTable("Votes", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

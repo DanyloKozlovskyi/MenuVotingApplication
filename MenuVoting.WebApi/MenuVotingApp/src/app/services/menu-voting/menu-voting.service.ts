@@ -23,28 +23,24 @@ export class MenuVotingService {
   public createMenuPool(menuPool: MenuPool): Observable<MenuPool> {
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
-    console.log('createMenuPool: ' + localStorage['token']);
     return this.httpClient.post<MenuPool>(`${API_BASE_URL}menuvotings`, menuPool, { headers: headers });
   }
 
   public putMenuPool(menuPool: MenuPool): Observable<string> {
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
-
     return this.httpClient.put<string>(`${API_BASE_URL}menuvotings/${menuPool.id}`, menuPool, { headers: headers });
   }
 
   public deleteMenuPool(id: string | null): Observable<string> {
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
-
     return this.httpClient.delete<string>(`${API_BASE_URL}menuvotings/${id}`, { headers: headers });
   }
 
   public deleteMenu(id: string | null): Observable<string> {
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
-
     return this.httpClient.delete<string>(`${API_BASE_URL}menuvotings/menu/${id}`, { headers: headers });
   }
 

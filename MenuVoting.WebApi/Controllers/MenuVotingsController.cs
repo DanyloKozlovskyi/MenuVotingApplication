@@ -26,7 +26,6 @@ namespace MenuVoting.WebApi.Controllers
             menuVotingService = service;
         }
 
-        // GET: api/MenuPools/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MenuPool>> GetMenuPool(Guid id)
         {
@@ -55,8 +54,6 @@ namespace MenuVoting.WebApi.Controllers
             return Ok(menuPool);
         }
 
-        // PUT: api/MenuPools/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutMenuPool(Guid id, MenuPool menuPool)
@@ -71,25 +68,22 @@ namespace MenuVoting.WebApi.Controllers
             return Ok(result);
         }
 
-        // POST: api/MenuPools
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<MenuPool>> PostMenuPool(MenuPoolCreate menuPoolCreate)
         {
             var menuPool = await menuVotingService.CreateMenuPool(menuPoolCreate);
 
-            return CreatedAtAction("GetMenuPool", new { id = menuPool.Id });
+            return CreatedAtAction(nameof(GetMenuPool), new { id = menuPool.Id }, menuPool);
         }
 
         [HttpPost("{id}/menu")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<MenuPool>> AddMenuToMenuPool(Guid id, MenuCreate menuCreate)
         {
-            menuCreate.MenuPoolId = id;
             Menu menu = await menuVotingService.CreateMenu(menuCreate);
 
-            return CreatedAtAction("GetMenuPool", new { id });
+            return CreatedAtAction(nameof(GetMenuPool), new { id }, menu);
         }
 
         [HttpPost("vote")]
@@ -97,10 +91,9 @@ namespace MenuVoting.WebApi.Controllers
         {
             Vote vote = await menuVotingService.CreateVote(voteCreate);
 
-            return CreatedAtAction("GetMenuPool", new { id = vote.Id });
+            return CreatedAtAction(nameof(GetMenuPool), new { id = vote.Id });
         }
 
-        // DELETE: api/MenuPools/5
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMenuPool(Guid id)
@@ -114,7 +107,6 @@ namespace MenuVoting.WebApi.Controllers
             return Ok(deleteSucceeded);
         }
 
-        // DELETE: api/MenuPools/5
         [Authorize(Roles = "Admin")]
         [HttpDelete("menu/{id}")]
         public async Task<IActionResult> DeleteMenu(Guid id)

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace MenuVoting.DataAccess.Dtos
 {
-	public class MenuCreate
-	{
-		public ICollection<string>? Components { get; set; }
-		public Guid MenuPoolId { get; set; }
-	}
+    public class MenuCreate
+    {
+        public ICollection<string>? Dishes { get; set; }
+        public Guid MenuPoolId { get; set; }
+    }
 }
