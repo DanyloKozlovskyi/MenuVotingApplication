@@ -903,3 +903,8 @@ a.button-link:link, a.button-link:visited {
   justify-content: center; 
   align-items: center; 
 }
+
+.button-container {
+  display: flex; 
+  gap: 10px; 
+}

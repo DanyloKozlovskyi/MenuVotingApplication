@@ -70,6 +70,20 @@ export class MenuVotingComponent {
     });
   }
 
+  public fillPutMenuForm(menu: Menu) {
+    this.putMenuFormArray.push(new FormGroup({
+      id: new FormControl(menu.id, [Validators.required]),
+      dishes: new FormArray([]),
+      menuPoolId: new FormControl(menu.menuPoolId, [Validators.required]),
+    }));
+
+    menu.dishes?.forEach((dish) => {
+      this.putMenuPool_MenusControl(this.menus.length - 1).push(new FormGroup({
+        value: new FormControl(dish, [Validators.required])
+      }))
+    });
+  }
+
   public postMenuSubmitted() {
     this.isPostMenuFormSubmitted = true;
     this.dishes = [];
@@ -89,29 +103,13 @@ export class MenuVotingComponent {
     for (let i = 0; i < this.postDishesFormArray.length; i++) {
       this.postDishesFormArray.controls[i].reset(this.postDishesFormArray.controls[i].value);
     }
-    // let system = new System(uuid(), this.parameters, null);
+    let menu = new Menu(null, this.dishes, this.menupool.id);
 
-    let menu = new Menu(null, this.dishes, null);
-
-    this.menus.push(menu);
-
-    this.putMenuFormArray.push(new FormGroup({
-      id: new FormControl(menu.id, [Validators.required]),
-      dishes: new FormArray([]),
-      menuPoolId: new FormControl(menu.menuPoolId, [Validators.required]),
-    }));
-
-    console.log(this.dishes);
-    menu.dishes?.forEach((dish) => {
-      this.putMenuPool_MenusControl(this.menus.length - 1).push(new FormGroup({
-        value: new FormControl(dish, [Validators.required])
-      }))
-    });
-
-    //this.postSystemForm.value
     this.menuVotingService.postMenu(this.menupool.id, menu).subscribe({
       next: (response: Menu) => {
         this.isInputValid = true;
+        this.menus.push(response);
+        this.fillPutMenuForm(response);
       },
 
       error: (error: any) => {
@@ -131,6 +129,9 @@ export class MenuVotingComponent {
       next: (response: MenuPool) => {
         this.menus = response.menus;
         console.log(this.menus);
+        this.menupool = response;
+        console.log(this.menupool);
+
         this.putMenuFormArray.clear();
 
         this.isCurrentMenuPoolCreated = true;
@@ -192,8 +193,6 @@ export class MenuVotingComponent {
 
   public resizePostForm(): void {
     this.rows = this.postRows_RowsControl.value;
-
-    //console.log(`start this.parameters: ${this.parameters}`);
 
     if (this.dishes.length < this.rows) {
       let length = this.dishes.length;

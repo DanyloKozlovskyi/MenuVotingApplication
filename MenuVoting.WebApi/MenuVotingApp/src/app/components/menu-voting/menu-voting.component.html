@@ -21,8 +21,6 @@
           </tr>
         </tbody>
       </table>
-
-
       <table class="table w-100" [formGroup]="putMenuForm" *ngIf="isCurrentMenuPoolCreated">
 
         <thead>
@@ -35,7 +33,7 @@
 
         <tbody formArrayName="menupool">
           <tr [formGroupName]="i" *ngFor="let menu of menus; let i = index" class="table-row-left">
-            <td style="width:5%">{{i+1}}</td>
+            <!--<td style="width:5%">{{i+1}}</td>-->
 
             <td formArrayName="dishes" *ngFor="let row of putMenuPool_MenusControl(i).controls; let j = index" class="table-data-6">
               <div *ngIf="j !== 0">
@@ -48,10 +46,9 @@
               </div>
             </td>
             <!--it was 200px there-->
-            <td style="width:50px" *ngIf="accountService.isAdmin">
+            <td style="width:50px" class="button-container" *ngIf="accountService.isAdmin">
               <button class="button button-red-back ml" (click)="deleteClicked(menu, i)" *ngIf="menu.id != editId" type="button">Delete</button>
               <button class="button button-blue-back ml" (click)="editClicked(menu)" *ngIf="menu.id != editId" type="button">Edit</button>
-
             </td>
           </tr>
         </tbody>

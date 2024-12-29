@@ -24,7 +24,7 @@ namespace MenuVoting.WebApi.Util
 
             CreateMap<MenuCreate, Menu>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.Dishes, opt => opt.MapFrom(src => src.Components))
+                .ForMember(dest => dest.Dishes, opt => opt.MapFrom(src => src.Dishes))
                 .ForMember(dest => dest.MenuPoolId, opt => opt.MapFrom(src => src.MenuPoolId));
 
             CreateMap<RestaurantCreate, Restaurant>()
