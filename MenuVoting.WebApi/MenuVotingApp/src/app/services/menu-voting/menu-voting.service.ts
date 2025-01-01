@@ -26,10 +26,10 @@ export class MenuVotingService {
     return this.httpClient.post<MenuPool>(`${API_BASE_URL}menuvotings`, menuPool, { headers: headers });
   }
 
-  public putMenuPool(menuPool: MenuPool): Observable<string> {
+  public putMenuPool(menuPoolId: string | null, menuPool: MenuPool): Observable<string> {
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
-    return this.httpClient.put<string>(`${API_BASE_URL}menuvotings/${menuPool.id}`, menuPool, { headers: headers });
+    return this.httpClient.put<string>(`${API_BASE_URL}menuvotings/${menuPoolId}`, menuPool, { headers: headers });
   }
 
   public deleteMenuPool(id: string | null): Observable<string> {

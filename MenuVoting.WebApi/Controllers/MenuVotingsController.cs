@@ -58,11 +58,6 @@ namespace MenuVoting.WebApi.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutMenuPool(Guid id, MenuPool menuPool)
         {
-            if (id != menuPool.Id)
-            {
-                return BadRequest();
-            }
-
             bool result = await menuVotingService.UpdateMenuPool(id, menuPool);
 
             return Ok(result);

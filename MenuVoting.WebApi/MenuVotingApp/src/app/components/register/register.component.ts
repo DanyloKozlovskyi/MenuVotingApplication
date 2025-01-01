@@ -123,7 +123,7 @@ export class RegisterComponent implements AfterViewInit {
       this.accountService.postRegister(this.registerForm.value).subscribe({
         next: (response: any) => {
           this.isRegisterValid = true;
-          this.accountService.currentUserName = response.email;
+          this.accountService.currentToken = response.email;
           this.isRegisterFormSubmitted = false;
           localStorage["token"] = response.token;
           localStorage["refreshToken"] = response.refreshToken;

@@ -31,34 +31,38 @@
           </tr>
         </thead>
 
-        <tbody formArrayName="menupool">
+        <tbody formArrayName="menus">
           <tr [formGroupName]="i" *ngFor="let menu of menus; let i = index" class="table-row-left">
-            <!--<td style="width:5%">{{i+1}}</td>-->
+            <td>
+              <input type="checkbox"
+                     [checked]="selectedVoteIndex === menu.id"
+                     (change)="onVoteChange(menu.id)" />
+            </td>
 
-            <td formArrayName="dishes" *ngFor="let row of putMenuPool_MenusControl(i).controls; let j = index" class="table-data-6">
-              <div *ngIf="j !== 0">
-                <span type="text" class="form-span-parameter">{{row.value.value}}</span>
+            <td formArrayName="dishes" *ngFor="let dish of putMenuPool_MenusControl(i).controls; let j = index" class="table-data-6 string-item">
+              <div *ngIf="j !== 0" [formGroupName]="j">
+                <input type="text" formControlName="value" [ngClass]=" { 'border-less-textbox': menu.id != editId, 'form-input': menu.id == editId }" value="{{dish.value.value}}"/>
                 <span class="text-grey flex-text" *ngIf="j != putMenuPool_MenusControl(i).length - 1">, </span>
               </div>
-              <div *ngIf="j === 0">
-                <span type="text" class="form-span-parameter">{{row.value.value}}</span>
+              <div *ngIf="j === 0" [formGroupName]="j">
+                <input type="text" formControlName="value" [ngClass]=" { 'border-less-textbox': menu.id != editId, 'form-input': menu.id == editId }" value="{{dish.value.value}}"/>
                 <span class="text-grey flex-text" *ngIf="j != putMenuPool_MenusControl(i).length - 1">, </span>
               </div>
             </td>
             <!--it was 200px there-->
             <td style="width:50px" class="button-container" *ngIf="accountService.isAdmin">
               <button class="button button-red-back ml" (click)="deleteClicked(menu, i)" *ngIf="menu.id != editId" type="button">Delete</button>
-              <button class="button button-blue-back ml" (click)="editClicked(menu)" *ngIf="menu.id != editId" type="button">Edit</button>
+              <button class="button button-blue-back ml" (click)="editClicked(menu, i)" *ngIf="menu.id != editId" type="button">Edit</button>
+              <button class="button button-blue-back" (click)="updateClicked(i)" *ngIf="menu.id == editId" type="submit">Update</button>
             </td>
           </tr>
         </tbody>
-
       </table>
     </div>
   </div>
   <!--it was w-50 there-->
   <div class="flex-1 w-50">
-    <div class="form-container" *ngIf="isCurrentMenuPoolCreated">
+    <div class="form-container" *ngIf="isCurrentMenuPoolCreated && accountService.isAdmin">
       <form [formGroup]="postRowsForm">
         <select id="rows" formControlName="rows" (change)="resizePostForm()">
           <option value="1">1</option>

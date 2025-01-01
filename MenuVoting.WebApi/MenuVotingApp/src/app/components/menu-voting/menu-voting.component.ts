@@ -30,7 +30,7 @@ export class MenuVotingComponent {
   isInputValid: boolean = true;
   editId: string | null = null;
   menupool: MenuPool = new MenuPool(null, [], null);
-
+  selectedVoteIndex: string | null = null;
   constructor(private menuVotingService: MenuVotingService, public accountService: AccountService) {
     this.postMenuForm = new FormGroup({
       dishes: new FormArray([])
@@ -41,7 +41,7 @@ export class MenuVotingComponent {
     });
 
     this.putMenuForm = new FormGroup({
-      menupool: new FormArray([])
+      menus: new FormArray([])
     })
   }
 
@@ -121,16 +121,14 @@ export class MenuVotingComponent {
   }
 
   get putMenuFormArray(): FormArray {
-    return this.putMenuForm.get("menupool") as FormArray;
+    return this.putMenuForm.get("menus") as FormArray;
   }
 
   loadMenus() {
     this.menuVotingService.getCurrentMenuPool().subscribe({
       next: (response: MenuPool) => {
         this.menus = response.menus;
-        console.log(this.menus);
         this.menupool = response;
-        console.log(this.menupool);
 
         this.putMenuFormArray.clear();
 
@@ -169,8 +167,52 @@ export class MenuVotingComponent {
     return currentFormGroup.controls['dishes'] as FormArray;
   }
 
-  public editClicked(menu: Menu) {
+  public putMenuPool_IdControl(i: number): FormArray {
+    let currentFormGroup = this.putMenuFormArray.controls[i] as FormGroup;
+    return currentFormGroup.controls['id'] as FormArray;
+  }
+
+  public editClicked(menu: Menu, i: number) {
     this.editId = menu.id;
+
+    const dishesControl = this.putMenuPool_MenusControl(i);
+
+    //for (let j = 0; j < dishesControl.length; j++) {
+    //  if (dishesControl.at(j).disabled) {
+    //    dishesControl.at(j).enable();
+    //  } else {
+    //    dishesControl.at(j).disable();
+    //  }
+    //}
+  }
+
+  public updateClicked(i: number) {
+    let menusToUpdate = [];
+    console.log(this.putMenuFormArray.controls[i].value);
+
+
+    for (var i = 0; i < this.menus.length; i++) {
+      let dishesToUpdate = [];
+      const menusControl = this.putMenuPool_MenusControl(i);
+      for (var j = 0; j < menusControl.length; j++) {
+        dishesToUpdate.push(menusControl.at(j).value.value);
+      }
+      menusToUpdate.push(new Menu(this.putMenuPool_IdControl(i).value, dishesToUpdate, this.menupool.id));
+    }
+
+    const menuPoolUpdate = new MenuPool(this.menupool.id, menusToUpdate, this.accountService.restaurantId);
+    this.menuVotingService.putMenuPool(this.menupool.id, menuPoolUpdate).subscribe({
+      next: (response: string) => {
+        this.editId = null;
+        this.putMenuForm.reset(this.putMenuForm.value);
+      },
+      error: (error: any) => {
+        console.log(error)
+      },
+      complete: () => {
+
+      }
+    })
   }
 
   public deleteClicked(menu: Menu, i: number): void {
@@ -188,6 +230,16 @@ export class MenuVotingComponent {
         },
         complete: () => { }
       })
+    }
+  }
+
+  public onVoteChange(index: string | null): void {
+    if (this.selectedVoteIndex === index) {
+      // If the selected option is clicked again, uncheck it (reset the vote)
+      this.selectedVoteIndex = null;
+    } else {
+      // Set the selected option
+      this.selectedVoteIndex = index;
     }
   }
 

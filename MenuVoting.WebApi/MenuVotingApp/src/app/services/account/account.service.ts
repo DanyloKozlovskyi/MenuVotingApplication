@@ -11,10 +11,13 @@ const API_BASE_URL: string = "https://localhost:7294/api/account/";
   providedIn: 'root'
 })
 export class AccountService {
-  currentUserName: string | null = null;
+  currentToken: string | null = null;
   restaurantId: string | null = null;
   isAdmin: boolean = false;
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient)
+  {
+    
+  }
 
   setUserRole(token: string | null) {
     if (token != null) {

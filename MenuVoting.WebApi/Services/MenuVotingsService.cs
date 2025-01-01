@@ -42,9 +42,11 @@ namespace MenuVoting.WebApi.Services
             {
                 return false;
             }
-            MenuPool? menuPoolToUpdate = await dbContext.MenuPools.FirstOrDefaultAsync(x => x.Id == id);
+            MenuPool? menuPoolToUpdate = await dbContext.MenuPools.Include(x => x.Menus).FirstOrDefaultAsync(x => x.Id == id);
 
-            menuPoolToUpdate.RestaurantId = menuPool.RestaurantId;
+            menuPoolToUpdate.Menus = menuPool.Menus;
+
+            await dbContext.SaveChangesAsync();
             return true;
         }
 

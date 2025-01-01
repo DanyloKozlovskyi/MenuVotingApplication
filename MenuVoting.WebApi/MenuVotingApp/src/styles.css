@@ -908,3 +908,24 @@ a.button-link:link, a.button-link:visited {
   display: flex; 
   gap: 10px; 
 }
+
+.string-array-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.string-item {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+  .string-item input {
+    width: 80px;
+  }
+
+  .string-item span {
+    margin: 5px;
+  }

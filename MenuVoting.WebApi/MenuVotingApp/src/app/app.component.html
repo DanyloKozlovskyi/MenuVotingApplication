@@ -9,7 +9,7 @@
       <div class="flex-1" id="search-box-div">
         <div class="navbar account-links">
 
-          <ul *ngIf="accountService.currentUserName === '' || accountService.currentUserName === null || accountService.currentUserName === undefined">
+          <ul *ngIf="accountService.currentToken === '' || accountService.currentToken === null || accountService.currentToken === undefined">
             <li>
               <a [routerLink]="[ '/login' ]">Login</a>
             </li>
@@ -18,7 +18,7 @@
             </li>
           </ul>
 
-          <ul *ngIf="accountService.currentUserName !== '' && accountService.currentUserName !== null && accountService.currentUserName !== undefined">
+          <ul *ngIf="accountService.currentToken !== '' && accountService.currentToken !== null && accountService.currentToken !== undefined">
             <li>
               <a href="#" onclick="return false" (click)="logOutClicked()">Logout</a>
             </li>
@@ -28,7 +28,7 @@
     </div>
     <div class="navbar mb">
 
-      <ul *ngIf="accountService.currentUserName !== '' && accountService.currentUserName !== null && accountService.currentUserName !== undefined">
+      <ul *ngIf="accountService.currentToken !== '' && accountService.currentToken !== null && accountService.currentToken !== undefined">
         <li>
           <a [routerLink]="[ '/menu-voting' ]" [routerLinkActive]="['nav-active']">menu-voting</a>
         </li>
