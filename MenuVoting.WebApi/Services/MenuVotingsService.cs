@@ -42,9 +42,11 @@ namespace MenuVoting.WebApi.Services
             {
                 return false;
             }
-            MenuPool? menuPoolToUpdate = await dbContext.MenuPools.FirstOrDefaultAsync(x => x.Id == id);
+            MenuPool? menuPoolToUpdate = await dbContext.MenuPools.Include(x => x.Menus).FirstOrDefaultAsync(x => x.Id == id);
 
-            menuPoolToUpdate.RestaurantId = menuPool.RestaurantId;
+            menuPoolToUpdate.Menus = menuPool.Menus;
+
+            await dbContext.SaveChangesAsync();
             return true;
         }
 
@@ -72,10 +74,16 @@ namespace MenuVoting.WebApi.Services
             return true;
         }
 
-        public async Task<Vote> CreateVote(VoteCreate voteCreate)
+        public async Task<Vote> CreateVote(Guid menuPoolId, VoteCreate voteCreate)
         {
-            if (await CheckExistenceOfVote(voteCreate))
-                throw new ArgumentException(nameof(voteCreate));
+            if (await CheckExistenceOfVote(menuPoolId, voteCreate))
+            {
+                var voteToChange = await CurrentVote(menuPoolId, voteCreate.UserId);
+                voteToChange.MenuId = voteCreate.MenuId;
+
+                await dbContext.SaveChangesAsync();
+                return voteToChange;
+            }
 
             Vote vote = mapper.Map<Vote>(voteCreate);
             dbContext.Votes.Add(vote);
@@ -84,11 +92,16 @@ namespace MenuVoting.WebApi.Services
             return vote;
         }
 
-        public async Task<bool> CheckExistenceOfVote(VoteCreate voteCreate)
+        public async Task<bool> CheckExistenceOfVote(Guid menuPoolId, VoteCreate voteCreate)
         {
-            var existingVote = await dbContext.Votes.FirstOrDefaultAsync(x => x.UserId == voteCreate.UserId && x.MenuId == x.MenuId);
+            var existingVote = await CurrentVote(menuPoolId, voteCreate.UserId);
 
-            return existingVote == null;
+            return existingVote != null;
+        }
+
+        public async Task<Vote?> CurrentVote(Guid menuPoolId, Guid userId)
+        {
+            return await dbContext.MenuPools.Include(mp => mp.Menus).ThenInclude(m => m.Votes).Where(mp => mp.Id == menuPoolId).SelectMany(mp => mp.Menus).SelectMany(m => m.Votes).FirstOrDefaultAsync(v => v.UserId == userId);
         }
 
         public async Task<Menu> CreateMenu(MenuCreate menuCreate)

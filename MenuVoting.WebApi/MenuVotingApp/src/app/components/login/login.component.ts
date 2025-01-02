@@ -40,7 +40,7 @@ export class LoginComponent {
         next: (response: any) => {
           this.isLoginValid = true;
 
-          this.accountService.currentUserName = response.email;
+          this.accountService.currentToken = response.email;
           this.isLoginFormSubmitted = false;
           localStorage["token"] = response.token;
           localStorage["refreshToken"] = response.refreshToken;

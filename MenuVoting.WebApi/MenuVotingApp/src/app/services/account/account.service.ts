@@ -11,16 +11,21 @@ const API_BASE_URL: string = "https://localhost:7294/api/account/";
   providedIn: 'root'
 })
 export class AccountService {
-  currentUserName: string | null = null;
+  currentToken: string | null = null;
   restaurantId: string | null = null;
   isAdmin: boolean = false;
-  constructor(private httpClient: HttpClient) { }
+  userId: string | null = null;
+  constructor(private httpClient: HttpClient)
+  {
+    
+  }
 
   setUserRole(token: string | null) {
     if (token != null) {
       const decodedToken = jwtDecode<{ [key: string]: any }>(token);
       const role = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
       this.restaurantId = decodedToken['Organization'];
+      this.userId = decodedToken['sub'];
       console.log(token);
       console.log(decodedToken);
       console.log(role);
