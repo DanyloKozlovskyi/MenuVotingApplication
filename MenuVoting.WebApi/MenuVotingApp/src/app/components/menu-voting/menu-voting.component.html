@@ -35,7 +35,7 @@
           <tr [formGroupName]="i" *ngFor="let menu of menus; let i = index" class="table-row-left">
             <td>
               <input type="checkbox"
-                     [checked]="selectedVoteIndex === menu.id"
+                     [checked]="selectedMenuId === menu.id"
                      (change)="onVoteChange(menu.id)" />
             </td>
 
