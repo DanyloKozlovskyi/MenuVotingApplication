@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
 import { Menu } from 'src/app/models/menu/menu';
 import { AccountService } from 'src/app/services/account/account.service';
 import { MenuVotingService } from 'src/app/services/menu-voting/menu-voting.service';
@@ -30,8 +29,8 @@ export class MenuVotingComponent {
   isCurrentMenuPoolCreated: boolean = false;
   isInputValid: boolean = true;
   editId: string | null = null;
-  menupool: MenuPool = new MenuPool(null, [], null);
-  selectedVoteIndex: string | null = null;
+  menuPool: MenuPool = new MenuPool(null, [], null);
+  selectedMenuId: string | null = null;
   constructor(private menuVotingService: MenuVotingService, public accountService: AccountService) {
     this.postMenuForm = new FormGroup({
       dishes: new FormArray([])
@@ -59,7 +58,7 @@ export class MenuVotingComponent {
       next: (response: MenuPool) => {
         this.isInputValid = true;
         this.isCurrentMenuPoolCreated = true;
-        this.menupool = response;
+        this.menuPool = response;
       },
 
       error: (error: any) => {
@@ -104,9 +103,9 @@ export class MenuVotingComponent {
     for (let i = 0; i < this.postDishesFormArray.length; i++) {
       this.postDishesFormArray.controls[i].reset(this.postDishesFormArray.controls[i].value);
     }
-    let menu = new Menu(null, this.dishes, this.menupool.id);
+    let menu = new Menu(null, this.dishes, this.menuPool.id);
 
-    this.menuVotingService.postMenu(this.menupool.id, menu).subscribe({
+    this.menuVotingService.postMenu(this.menuPool.id, menu).subscribe({
       next: (response: Menu) => {
         this.isInputValid = true;
         this.menus.push(response);
@@ -126,9 +125,9 @@ export class MenuVotingComponent {
   }
 
   loadVote() {
-    this.menuVotingService.getCurrentVote(this.menupool.id).subscribe({
+    this.menuVotingService.getCurrentVote(this.menuPool.id).subscribe({
       next: (response: Vote) => {
-        this.selectedVoteIndex = response.menuId;
+        this.selectedMenuId = response.menuId;
       },
 
       error: (error: any) => {
@@ -143,7 +142,7 @@ export class MenuVotingComponent {
     this.menuVotingService.getCurrentMenuPool().subscribe({
       next: (response: MenuPool) => {
         this.menus = response.menus;
-        this.menupool = response;
+        this.menuPool = response;
 
         this.putMenuFormArray.clear();
 
@@ -214,11 +213,11 @@ export class MenuVotingComponent {
       for (var j = 0; j < menusControl.length; j++) {
         dishesToUpdate.push(menusControl.at(j).value.value);
       }
-      menusToUpdate.push(new Menu(this.putMenuPool_IdControl(i).value, dishesToUpdate, this.menupool.id));
+      menusToUpdate.push(new Menu(this.putMenuPool_IdControl(i).value, dishesToUpdate, this.menuPool.id));
     }
 
-    const menuPoolUpdate = new MenuPool(this.menupool.id, menusToUpdate, this.accountService.restaurantId);
-    this.menuVotingService.putMenuPool(this.menupool.id, menuPoolUpdate).subscribe({
+    const menuPoolUpdate = new MenuPool(this.menuPool.id, menusToUpdate, this.accountService.restaurantId);
+    this.menuVotingService.putMenuPool(this.menuPool.id, menuPoolUpdate).subscribe({
       next: (response: string) => {
         this.editId = null;
         this.putMenuForm.reset(this.putMenuForm.value);
@@ -251,22 +250,22 @@ export class MenuVotingComponent {
   }
 
   public onVoteChange(index: string | null): void {
-    if (this.selectedVoteIndex === index) {
-      this.selectedVoteIndex = null;
+    if (this.selectedMenuId === index) {
+      this.selectedMenuId = null;
     } else {
-      this.selectedVoteIndex = index;
+      this.selectedMenuId = index;
     }
   }
 
   public vote(): void {
-    let vote = new Vote(null, this.accountService.userId, this.selectedVoteIndex);
-    this.menuVotingService.castVote(this.menupool.id, vote).subscribe({
+    let vote = new Vote(null, this.accountService.userId, this.selectedMenuId);
+    this.menuVotingService.castVote(this.menuPool.id, vote).subscribe({
       next: (response: Vote) => {
-        this.selectedVoteIndex = response.menuId;
+        this.selectedMenuId = response.menuId;
       },
       error: (error: any) => {
         console.log(error);
-        this.selectedVoteIndex = null;
+        this.selectedMenuId = null;
       },
       complete: () => { }
     })
