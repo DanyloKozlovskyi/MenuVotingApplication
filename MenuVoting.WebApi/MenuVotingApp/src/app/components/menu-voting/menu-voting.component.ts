@@ -8,6 +8,7 @@ import { Menu } from 'src/app/models/menu/menu';
 import { AccountService } from 'src/app/services/account/account.service';
 import { MenuVotingService } from 'src/app/services/menu-voting/menu-voting.service';
 import { MenuPool } from 'src/app/models/menu-pool/menu-pool';
+import { Vote } from 'src/app/models/vote/vote';
 
 @Component({
   selector: 'app-menu-voting',
@@ -124,6 +125,20 @@ export class MenuVotingComponent {
     return this.putMenuForm.get("menus") as FormArray;
   }
 
+  loadVote() {
+    this.menuVotingService.getCurrentVote(this.menupool.id).subscribe({
+      next: (response: Vote) => {
+        this.selectedVoteIndex = response.menuId;
+      },
+
+      error: (error: any) => {
+        console.log(error);
+      },
+
+      complete: () => { }
+    });
+  }
+
   loadMenus() {
     this.menuVotingService.getCurrentMenuPool().subscribe({
       next: (response: MenuPool) => {
@@ -148,6 +163,8 @@ export class MenuVotingComponent {
             }));
           });
         });
+
+        this.loadVote();
       },
 
       error: (error: any) => {
@@ -235,12 +252,24 @@ export class MenuVotingComponent {
 
   public onVoteChange(index: string | null): void {
     if (this.selectedVoteIndex === index) {
-      // If the selected option is clicked again, uncheck it (reset the vote)
       this.selectedVoteIndex = null;
     } else {
-      // Set the selected option
       this.selectedVoteIndex = index;
     }
+  }
+
+  public vote(): void {
+    let vote = new Vote(null, this.accountService.userId, this.selectedVoteIndex);
+    this.menuVotingService.castVote(this.menupool.id, vote).subscribe({
+      next: (response: Vote) => {
+        this.selectedVoteIndex = response.menuId;
+      },
+      error: (error: any) => {
+        console.log(error);
+        this.selectedVoteIndex = null;
+      },
+      complete: () => { }
+    })
   }
 
   public resizePostForm(): void {

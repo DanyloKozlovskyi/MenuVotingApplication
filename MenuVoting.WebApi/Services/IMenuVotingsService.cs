@@ -18,13 +18,14 @@ namespace MenuVoting.WebApi.Services
 
         Task<bool> DeleteMenuPool(Guid id);
 
-        Task<Vote> CreateVote(VoteCreate voteCreate);
+        Task<Vote> CreateVote(Guid menuPoolId, VoteCreate voteCreate);
 
-        Task<bool> CheckExistenceOfVote(VoteCreate voteCreate);
+        Task<bool> CheckExistenceOfVote(Guid menuPoolId, VoteCreate voteCreate);
 
         Task<Menu> CreateMenu(MenuCreate menuCreate);
 
         Task<MenuPool?> CurrentMenuPool(Guid restaurantId);
         Task<bool> DeleteMenu(Guid id);
+        Task<Vote?> CurrentVote(Guid menuPoolId, Guid userId);
     }
 }

@@ -54,6 +54,21 @@ namespace MenuVoting.WebApi.Controllers
             return Ok(menuPool);
         }
 
+        [HttpGet("{menuPoolId}/vote/current")]
+        public async Task<ActionResult<MenuPool>> GetCurrentVote(Guid menuPoolId)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var vote = await menuVotingService.CurrentVote(menuPoolId, userId);
+
+            if (vote == null)
+            {
+                return Problem();
+            }
+
+            return Ok(vote);
+        }
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutMenuPool(Guid id, MenuPool menuPool)
@@ -81,12 +96,12 @@ namespace MenuVoting.WebApi.Controllers
             return CreatedAtAction(nameof(GetMenuPool), new { id }, menu);
         }
 
-        [HttpPost("vote")]
-        public async Task<ActionResult<MenuPool>> PostVote(VoteCreate voteCreate)
+        [HttpPost("{menuPoolId}/vote")]
+        public async Task<ActionResult<MenuPool>> CastVote(Guid menuPoolId, VoteCreate voteCreate)
         {
-            Vote vote = await menuVotingService.CreateVote(voteCreate);
+            Vote vote = await menuVotingService.CreateVote(menuPoolId, voteCreate);
 
-            return CreatedAtAction(nameof(GetMenuPool), new { id = vote.Id });
+            return CreatedAtAction(nameof(GetMenuPool), new { id = menuPoolId }, voteCreate);
         }
 
         [Authorize(Roles = "Admin")]

@@ -14,6 +14,7 @@ export class AccountService {
   currentToken: string | null = null;
   restaurantId: string | null = null;
   isAdmin: boolean = false;
+  userId: string | null = null;
   constructor(private httpClient: HttpClient)
   {
     
@@ -24,6 +25,7 @@ export class AccountService {
       const decodedToken = jwtDecode<{ [key: string]: any }>(token);
       const role = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
       this.restaurantId = decodedToken['Organization'];
+      this.userId = decodedToken['sub'];
       console.log(token);
       console.log(decodedToken);
       console.log(role);

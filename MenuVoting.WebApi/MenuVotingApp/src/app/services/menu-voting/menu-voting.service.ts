@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { Menu } from 'src/app/models/menu/menu';
 import { MenuPool } from 'src/app/models/menu-pool/menu-pool';
+import { Vote } from 'src/app/models/vote/vote';
 
 const API_BASE_URL: string = "https://localhost:7294/api/";
 
@@ -44,10 +45,21 @@ export class MenuVotingService {
     return this.httpClient.delete<string>(`${API_BASE_URL}menuvotings/menu/${id}`, { headers: headers });
   }
 
-  public postMenu(menupoolId: string | null, menu: Menu): Observable<Menu> {
+  public postMenu(menuPoolId: string | null, menu: Menu): Observable<Menu> {
     let headers = new HttpHeaders();
     headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
-    console.log(menu);
-    return this.httpClient.post<Menu>(`${API_BASE_URL}menuvotings/${menupoolId}/menu`, menu, { headers: headers });
+    return this.httpClient.post<Menu>(`${API_BASE_URL}menuvotings/${menuPoolId}/menu`, menu, { headers: headers });
+  }
+
+  public getCurrentVote(menuPoolId: string | null): Observable<Vote> {
+    let headers = new HttpHeaders();
+    headers = headers.set("Authorization", `Bearer ${localStorage['token']}`);
+    return this.httpClient.get<Vote>(`${API_BASE_URL}menuvotings/${menuPoolId}/vote/current`, { headers: headers });
+  }
+
+  public castVote(menuPoolId: string | null, vote: Vote): Observable<Vote> {
+    let headers = new HttpHeaders();
+    headers = headers.append("Authorization", `Bearer ${localStorage['token']}`);
+    return this.httpClient.post<Vote>(`${API_BASE_URL}menuvotings/${menuPoolId}/vote`, vote, { headers: headers });
   }
 }
