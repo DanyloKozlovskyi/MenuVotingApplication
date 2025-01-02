@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     if (typeof window !== 'undefined' && localStorage) {
       this.accountService.currentToken = localStorage["token"];
-      console.log(localStorage['token']);
+      this.accountService.setUserRole(this.accountService.currentToken);
     }
   }
 

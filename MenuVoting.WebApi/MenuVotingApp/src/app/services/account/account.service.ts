@@ -26,9 +26,6 @@ export class AccountService {
       const role = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
       this.restaurantId = decodedToken['Organization'];
       this.userId = decodedToken['sub'];
-      console.log(token);
-      console.log(decodedToken);
-      console.log(role);
       this.isAdmin = role === 'Admin';
     }
   }
