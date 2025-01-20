@@ -53,7 +53,6 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
     };
-
 });
 
 builder.Services.AddScoped<IMenuVotingsService, MenuVotingsService>();
