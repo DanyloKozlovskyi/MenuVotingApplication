@@ -8,5 +8,5 @@ public interface IMenuPoolService
 	Task<bool> UpdateMenuPool(Guid id, MenuPool menuPool);
 	Task<MenuPool> CreateMenuPool(MenuPoolCreate menuPoolCreate);
 	Task<bool> DeleteMenuPool(Guid id);
-	Task<MenuPool?> CurrentMenuPool(Guid restaurantId);
+	Task<MenuPoolResponse?> CurrentMenuPool(Guid restaurantId);
 }

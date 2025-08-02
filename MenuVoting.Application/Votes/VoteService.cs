@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MenuVoting.Application.Mapper;
+using MenuVoting.Application.Menus;
 using MenuVoting.Domain;
 using MenuVoting.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ public class VoteService : IVoteService
 		mapper = map.CreateMapper();
 	}
 
-	public async Task<Vote> CreateVote(Guid menuPoolId, VoteCreate voteCreate)
+	public async Task<VoteResponse> CreateVote(Guid menuPoolId, VoteCreate voteCreate)
 	{
 		if (await CheckExistenceOfVote(menuPoolId, voteCreate))
 		{
@@ -36,7 +37,7 @@ public class VoteService : IVoteService
 		await _voteRepository.Create(vote);
 		await _voteRepository.SaveChangesAsync();
 
-		return vote;
+		return mapper.Map<VoteResponse>(vote);
 	}
 
 	public async Task<bool> CheckExistenceOfVote(Guid menuPoolId, VoteCreate voteCreate)
@@ -46,17 +47,29 @@ public class VoteService : IVoteService
 		return existingVote != null;
 	}
 
-	public async Task<Vote?> CurrentVote(Guid menuPoolId, Guid userId)
+	public async Task<VoteResponse?> CurrentVote(Guid menuPoolId, Guid userId)
 	{
-		string includeProperties = $"{nameof(Vote.Menu)},{nameof(Vote.Menu)}.{nameof(Menu.MenuPool)}";
+		//string includeProperties = $"{nameof(Vote.Menu)},{nameof(Vote.Menu)}.{nameof(Menu.MenuPool)}";
 
 		var vote = await _voteRepository
 			.Get(
 				whereExpression: v =>
 					v.UserId == userId
-					&& v.Menu.MenuPool.Id == menuPoolId,
-				includeProperties: includeProperties
+					&& v.Menu.MenuPool.Id == menuPoolId
+			//includeProperties: includeProperties
 			)
+			.Select(v => new VoteResponse
+			{
+				Id = v.Id,
+				MenuId = v.MenuId,
+				UserId = v.UserId,
+				Menu = new MenuResponse
+				{
+					Id = v.Menu.Id,
+					MenuPoolId = v.Menu.MenuPool.Id,
+					Dishes = v.Menu.Dishes,
+				}
+			})
 			.FirstOrDefaultAsync();
 		return vote;
 	}

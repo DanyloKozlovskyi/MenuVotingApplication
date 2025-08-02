@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MenuVoting.Application.Mapper;
+using MenuVoting.Application.Menus;
 using MenuVoting.Domain;
 using MenuVoting.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -71,16 +72,29 @@ public class MenuPoolService : IMenuPoolService
 
 		return true;
 	}
-	public async Task<MenuPool?> CurrentMenuPool(Guid restaurantId)
+	public async Task<MenuPoolResponse?> CurrentMenuPool(Guid restaurantId)
 	{
 		var today = DateOnly.FromDateTime(DateTime.UtcNow);
-		string includeProperties = nameof(MenuPool.Menus);
+		//string includeProperties = nameof(MenuPool.Menus);
 
 		var menuPool = await _menuPoolRepository
 			.Get(
-				whereExpression: mp => mp.RestaurantId == restaurantId && mp.Date == today,
-				includeProperties: includeProperties
+				whereExpression: mp => mp.RestaurantId == restaurantId && mp.Date == today
+			//includeProperties: includeProperties
 			)
+			.Select(mp => new MenuPoolResponse
+			{
+				Id = mp.Id,
+				Date = mp.Date,
+				Menus = mp.Menus
+				.Select(m => new MenuResponse
+				{
+					Id = m.Id,
+					Dishes = m.Dishes,
+					MenuPoolId = m.MenuPoolId,
+				})
+				.ToList()
+			})
 			.FirstOrDefaultAsync();
 
 		return menuPool;

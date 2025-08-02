@@ -19,13 +19,13 @@ public class MenuService : IMenuService
 		);
 		mapper = map.CreateMapper();
 	}
-	public async Task<Menu> CreateMenu(MenuCreate menuCreate)
+	public async Task<MenuResponse> CreateMenu(MenuCreate menuCreate)
 	{
 		Menu menu = mapper.Map<Menu>(menuCreate);
 		await _menuRepository.Create(menu);
 		await _menuRepository.SaveChangesAsync();
 
-		return menu;
+		return mapper.Map<MenuResponse>(menu);
 	}
 
 	public async Task<bool> DeleteMenu(Guid id)

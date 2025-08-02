@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace MenuVoting.Domain.Entities;
 public class Menu : IKeyedEntity<Guid>

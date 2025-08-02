@@ -1,17 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
-import { RegisterUser } from 'src/app/models/register-user/register-user';
-import { AccountService } from 'src/app/services/account/account.service';
-import { LoginUser } from 'src/app/models/login-user/login-user';
+import { RegisterUser } from 'src/app/core/models/register-user';
+import { AccountService } from 'src/app/core/services/account.service';
+import { LoginUser } from 'src/app/core/models/login-user';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
 export class LoginComponent {
   loginForm: FormGroup;
@@ -21,7 +26,7 @@ export class LoginComponent {
   constructor(private accountService: AccountService, private router: Router) {
     this.loginForm = new FormGroup({
       email: new FormControl(null, [Validators.required, Validators.email]),
-      password: new FormControl(null, [Validators.required])
+      password: new FormControl(null, [Validators.required]),
     });
   }
 
@@ -35,27 +40,25 @@ export class LoginComponent {
   loginSubmitted() {
     this.isLoginFormSubmitted = true;
     if (this.loginForm.valid) {
-
       this.accountService.postLogin(this.loginForm.value).subscribe({
         next: (response: any) => {
           this.isLoginValid = true;
 
           this.accountService.currentToken = response.email;
           this.isLoginFormSubmitted = false;
-          localStorage["token"] = response.token;
-          localStorage["refreshToken"] = response.refreshToken;
+          localStorage['token'] = response.token;
+          localStorage['refreshToken'] = response.refreshToken;
           this.accountService.setUserRole(localStorage['token']);
 
           this.router.navigate(['/menu-voting']);
 
           this.loginForm.reset();
-
         },
         error: (error: any) => {
           console.log(error);
           this.isLoginValid = false;
         },
-        complete: () => { }
+        complete: () => {},
       });
     }
   }

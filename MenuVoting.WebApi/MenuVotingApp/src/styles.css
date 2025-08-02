@@ -1,5 +1,5 @@
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 18px;
   background-color: #f7f7f7;
 }
@@ -16,7 +16,7 @@ body {
 
 .app-title {
   font-size: 1.9em;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   margin-left: 4px;
 }
 
@@ -33,30 +33,30 @@ body {
   padding: 10px;
 }
 
-  .navbar > ul {
-    list-style-type: none;
-    width: 100%;
-  }
+.navbar > ul {
+  list-style-type: none;
+  width: 100%;
+}
 
-    .navbar > ul > li {
-      width: 100%;
-    }
+.navbar > ul > li {
+  width: 100%;
+}
 
+.navbar > ul > li > a:link,
+.navbar > ul > li > a:visited {
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background-color 0.4s;
+  display: inline-block;
+  margin: 0px 3px;
+  color: #0e5eba;
+  text-decoration: none;
+}
 
-      .navbar > ul > li > a:link, .navbar > ul > li > a:visited {
-        padding: 4px 8px;
-        cursor: pointer;
-        transition: background-color 0.4s;
-        display: inline-block;
-        margin: 0px 3px;
-        color: #0e5eba;
-        text-decoration: none;
-      }
-
-      .navbar > ul > li > a:hover {
-        background-color: #ffffff;
-        color: #086581;
-      }
+.navbar > ul > li > a:hover {
+  background-color: #ffffff;
+  color: #086581;
+}
 
 .nav-active:before {
   content: "";
@@ -87,7 +87,6 @@ body {
   margin: 20px;
 }
 
-
 .page-content {
   min-height: 90vh;
   padding: 15px 20px;
@@ -110,36 +109,37 @@ body {
   margin: auto;
 }
 
-  .table thead {
-    font-weight: bold;
-    color: #000000;
-    text-align: left;
-  }
+.table thead {
+  font-weight: bold;
+  color: #000000;
+  text-align: left;
+}
 
-    .table thead a:link, .table thead a:visited {
-      color: #000000;
-      text-decoration: none;
-    }
+.table thead a:link,
+.table thead a:visited {
+  color: #000000;
+  text-decoration: none;
+}
 
-    .table thead a:hover {
-      text-decoration: underline;
-    }
+.table thead a:hover {
+  text-decoration: underline;
+}
 
-    .table thead th {
-      padding: 5px 10px;
-      text-align: left;
-      border-bottom: 3px solid #efefef;
-    }
+.table thead th {
+  padding: 5px 10px;
+  text-align: left;
+  border-bottom: 3px solid #efefef;
+}
 
-  .table tbody td {
-    padding: 6px 10px;
-  }
+.table tbody td {
+  padding: 6px 10px;
+}
 
-  .table tbody tr {
-    transition: background-color 0.4s, color 0.3s;
-    /*background-color: #efefef;*/
-    border-bottom: 1px solid #efefef;
-  }
+.table tbody tr {
+  transition: background-color 0.4s, color 0.3s;
+  /*background-color: #efefef;*/
+  border-bottom: 1px solid #efefef;
+}
 
 .flex-2-parameters {
   flex: 1 1;
@@ -205,7 +205,6 @@ body {
   margin-bottom: 10px;
 }
 
-
 .m {
   margin: 10px;
 }
@@ -230,7 +229,6 @@ body {
   padding-bottom: 10px;
 }
 
-
 .pl {
   padding-left: 10px;
 }
@@ -238,7 +236,6 @@ body {
 .pr {
   padding-right: 10px;
 }
-
 
 .grey-back {
   background-color: #dcdcdc;
@@ -279,7 +276,7 @@ body {
 .text-large {
   font-size: 2.5em;
   margin-top: 30px;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   margin-bottom: 10px;
 }
 
@@ -299,7 +296,6 @@ body {
   background-color: #9ad3f7;
 }
 
-
 .list-container {
   margin-top: 9px;
 }
@@ -311,23 +307,24 @@ body {
   border-radius: 8px;
 }
 
-  .list > li {
-    padding: 8px 12px;
-    background-color: #ffffff;
-    margin: 3px 2px;
-    border-radius: 5px;
-    transition: background-color 0.3s, color 0.3s;
-  }
+.list > li {
+  padding: 8px 12px;
+  background-color: #ffffff;
+  margin: 3px 2px;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+}
 
-    .list > li:hover {
-      background-color: #1383a4;
-      color: #ffffff;
-    }
+.list > li:hover {
+  background-color: #1383a4;
+  color: #ffffff;
+}
 
-  .list a:link, .list a:visited {
-    color: initial;
-    text-decoration: none;
-  }
+.list a:link,
+.list a:visited {
+  color: initial;
+  text-decoration: none;
+}
 
 .footer-content {
   background-color: #bfbfbf;
@@ -361,7 +358,6 @@ body {
   border-right: 1px solid #bfbfbf;
 }
 
-
 .box {
   margin: 10px 20px;
   padding: 15px;
@@ -381,9 +377,9 @@ body {
   align-items: stretch;
 }
 
-  .flex > div {
-    padding: 4px;
-  }
+.flex > div {
+  padding: 4px;
+}
 
 .flex-1 {
   flex: 1 auto;
@@ -409,7 +405,8 @@ body {
   flex: 6 auto;
 }
 
-a:link, a:visited {
+a:link,
+a:visited {
   color: blue;
 }
 
@@ -423,7 +420,8 @@ a.link-hover:hover {
   background-color: #e5e5e5;
 }
 
-a.button-link:link, a.button-link:visited {
+a.button-link:link,
+a.button-link:visited {
   color: #ffffff;
   padding: 8px 12px;
   border: 2px solid #cacaca;
@@ -478,6 +476,7 @@ a.button-link:link, a.button-link:visited {
   border: 2px solid #cacaca;
   border-radius: 8px;
   font-size: 101%;
+  cursor: pointer;
 }
 
 .button-blue-back {
@@ -486,9 +485,9 @@ a.button-link:link, a.button-link:visited {
   border: 2px solid #3f80ca;
 }
 
-  .button-blue-back:hover {
-    background-color: #1274c7;
-  }
+.button-blue-back:hover {
+  background-color: #1274c7;
+}
 
 .button-green-back {
   background-color: #088e36;
@@ -496,9 +495,9 @@ a.button-link:link, a.button-link:visited {
   border: 2px solid #73d695;
 }
 
-  .button-green-back:hover {
-    background-color: #066627;
-  }
+.button-green-back:hover {
+  background-color: #066627;
+}
 
 .button-red-back {
   background-color: #cb511e;
@@ -506,10 +505,9 @@ a.button-link:link, a.button-link:visited {
   border: 2px solid #e49776;
 }
 
-  .button-red-back:hover {
-    background-color: #96370f;
-  }
-
+.button-red-back:hover {
+  background-color: #96370f;
+}
 
 .button-panel {
   margin-top: 20px;
@@ -528,7 +526,6 @@ a.button-link:link, a.button-link:visited {
   display: inline-block;
 }
 
-
 .form-input {
   padding: 8px 10px;
   font-size: 105%;
@@ -538,11 +535,11 @@ a.button-link:link, a.button-link:visited {
   transition: box-shadow 0.2s;
 }
 
-  .form-input:focus {
-    outline: none;
-    border: 1px solid #245eb0;
-    box-shadow: 0px 0px 4px 0px #1383a4;
-  }
+.form-input:focus {
+  outline: none;
+  border: 1px solid #245eb0;
+  box-shadow: 0px 0px 4px 0px #1383a4;
+}
 
 .form-label {
   display: inline-block;
@@ -614,7 +611,6 @@ a.button-link:link, a.button-link:visited {
   flex-direction: column;
 }
 
-
 #stock-price-panel {
   width: 100%;
   max-width: 100%;
@@ -635,7 +631,8 @@ a.button-link:link, a.button-link:visited {
   flex-direction: column;
 }
 
-#buy-orders-list, #sell-orders-list {
+#buy-orders-list,
+#sell-orders-list {
   flex: 1 auto;
 }
 
@@ -675,10 +672,10 @@ a.button-link:link, a.button-link:visited {
     width: auto;
   }
 
-    .navbar > ul > li {
-      display: inline-block;
-      width: auto;
-    }
+  .navbar > ul > li {
+    display: inline-block;
+    width: auto;
+  }
 
   #stock-price-panel {
     flex: 2 0 auto;
@@ -705,20 +702,20 @@ a.button-link:link, a.button-link:visited {
     padding: 15px !important;
   }
 
-    .form-field > div:first-child {
-      flex: 1 !important;
-    }
+  .form-field > div:first-child {
+    flex: 1 !important;
+  }
 
-    .form-field > div:nth-child(2) {
-      flex: 3 !important;
-    }
+  .form-field > div:nth-child(2) {
+    flex: 3 !important;
+  }
 
   .form-field {
     flex-direction: row;
   }
 
   input.ng-valid:not(.ng-untouched) {
-    border: 1px solid #42A948; /* green */
+    border: 1px solid #42a948; /* green */
   }
 
   input.ng-invalid:not(.ng-untouched) {
@@ -735,7 +732,6 @@ a.button-link:link, a.button-link:visited {
     border: none;
     width: 100%;
   }
-
 
   .orders-list {
     flex-direction: row;
@@ -830,11 +826,11 @@ a.button-link:link, a.button-link:visited {
   width: 100px;
 }
 
-  .form-input-parameter:focus {
-    outline: none;
-    border: 1px solid #245eb0;
-    box-shadow: 0px 0px 4px 0px #1383a4;
-  }
+.form-input-parameter:focus {
+  outline: none;
+  border: 1px solid #245eb0;
+  box-shadow: 0px 0px 4px 0px #1383a4;
+}
 
 .flex-text-x {
   margin: auto 7px auto 0px;
@@ -843,7 +839,6 @@ a.button-link:link, a.button-link:visited {
 .flex-text {
   margin: auto 1px auto 0px;
 }
-
 
 .table-row-left {
   /*width: 15%;
@@ -854,10 +849,10 @@ a.button-link:link, a.button-link:visited {
   justify-content: left;
 }
 
-  .table-row-left td:last-child {
-    text-align: right; /* Align the last <td> to the right */
-    margin-left: auto;
-  }
+.table-row-left td:last-child {
+  text-align: right; /* Align the last <td> to the right */
+  margin-left: auto;
+}
 
 .search-box {
   width: 100%;
@@ -876,14 +871,14 @@ a.button-link:link, a.button-link:visited {
   border-bottom: 1px solid #ccc;
 }
 
-  .options li {
-    padding: 10px;
-    cursor: pointer;
-  }
+.options li {
+  padding: 10px;
+  cursor: pointer;
+}
 
-    .options li:hover {
-      background-color: #f0f0f0;
-    }
+.options li:hover {
+  background-color: #f0f0f0;
+}
 
 .select-box {
   position: relative;
@@ -899,14 +894,14 @@ a.button-link:link, a.button-link:visited {
 }
 
 .row-justify-center {
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .button-container {
-  display: flex; 
-  gap: 10px; 
+  display: flex;
+  gap: 10px;
 }
 
 .string-array-container {
@@ -922,10 +917,10 @@ a.button-link:link, a.button-link:visited {
   white-space: nowrap;
 }
 
-  .string-item input {
-    width: 80px;
-  }
+.string-item input {
+  width: 80px;
+}
 
-  .string-item span {
-    margin: 5px;
-  }
+.string-item span {
+  margin: 5px;
+}

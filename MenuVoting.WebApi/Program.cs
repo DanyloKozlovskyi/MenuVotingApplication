@@ -1,7 +1,6 @@
 using MenuVoting.Application.Identity;
 using MenuVoting.Application.MenuPools;
 using MenuVoting.Application.Menus;
-using MenuVoting.Application.MenuVotings;
 using MenuVoting.Application.Restaurants;
 using MenuVoting.Application.Votes;
 using MenuVoting.Domain;
@@ -59,7 +58,6 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddScoped(typeof(IEntityRepository<,>), typeof(EntityRepository<,>));
-//builder.Services.AddScoped<IMenuVotingsService, MenuVotingsService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IMenuPoolService, MenuPoolService>();
 builder.Services.AddScoped<IVoteService, VoteService>();

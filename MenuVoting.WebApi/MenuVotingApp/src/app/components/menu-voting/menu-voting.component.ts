@@ -1,20 +1,21 @@
 import { Component } from '@angular/core';
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Menu } from 'src/app/models/menu/menu';
-import { AccountService } from 'src/app/services/account/account.service';
-import { MenuVotingService } from 'src/app/services/menu-voting/menu-voting.service';
-import { MenuPool } from 'src/app/models/menu-pool/menu-pool';
-import { Vote } from 'src/app/models/vote/vote';
+import { Menu } from 'src/app/core/models/menu';
+import { AccountService } from 'src/app/core/services/account.service';
+import { MenuPoolService } from 'src/app/core/services/menu-pool.service';
+import { MenuService } from 'src/app/core/services/menu.service';
+import { VoteService } from 'src/app/core/services/vote.service';
+import { MenuPool } from 'src/app/core/models/menu-pool';
+import { Vote } from 'src/app/core/models/vote';
 
 @Component({
   selector: 'app-menu-voting',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './menu-voting.component.html',
-  styleUrl: './menu-voting.component.css'
+  styleUrl: './menu-voting.component.css',
 })
 export class MenuVotingComponent {
   rows: number = 3;
@@ -29,32 +30,40 @@ export class MenuVotingComponent {
   isCurrentMenuPoolCreated: boolean = false;
   isInputValid: boolean = true;
   editId: string | null = null;
-  menuPool: MenuPool = new MenuPool(null, [], null);
+  menuPool!: MenuPool;
   selectedMenuId: string | null = null;
-  constructor(private menuVotingService: MenuVotingService, public accountService: AccountService) {
+  constructor(
+    private menuPoolService: MenuPoolService,
+    private menuService: MenuService,
+    private voteService: VoteService,
+    public accountService: AccountService
+  ) {
     this.postMenuForm = new FormGroup({
-      dishes: new FormArray([])
+      dishes: new FormArray([]),
     });
 
     this.postRowsForm = new FormGroup({
-      rows: new FormControl(null)
+      rows: new FormControl(null),
     });
 
     this.putMenuForm = new FormGroup({
-      menus: new FormArray([])
-    })
+      menus: new FormArray([]),
+    });
   }
 
   get postRows_RowsControl(): any {
     return this.postRowsForm.controls['rows'];
   }
   get postDishesFormArray(): FormArray {
-    return this.postMenuForm.get("dishes") as FormArray;
+    return this.postMenuForm.get('dishes') as FormArray;
   }
 
   public createMenuPoolSubmitted() {
-    const menuPool = new MenuPool(null, [], this.accountService.restaurantId)
-    this.menuVotingService.createMenuPool(menuPool).subscribe({
+    const menuPool = {
+      menus: [],
+      restaurantId: this.accountService.restaurantId!,
+    };
+    this.menuPoolService.createMenuPool(menuPool).subscribe({
       next: (response: MenuPool) => {
         this.isInputValid = true;
         this.isCurrentMenuPoolCreated = true;
@@ -66,21 +75,25 @@ export class MenuVotingComponent {
         this.isInputValid = false;
         this.isCurrentMenuPoolCreated = false;
       },
-      complete: () => { }
+      complete: () => {},
     });
   }
 
   public fillPutMenuForm(menu: Menu) {
-    this.putMenuFormArray.push(new FormGroup({
-      id: new FormControl(menu.id, [Validators.required]),
-      dishes: new FormArray([]),
-      menuPoolId: new FormControl(menu.menuPoolId, [Validators.required]),
-    }));
+    this.putMenuFormArray.push(
+      new FormGroup({
+        id: new FormControl(menu.id, [Validators.required]),
+        dishes: new FormArray([]),
+        menuPoolId: new FormControl(menu.menuPoolId, [Validators.required]),
+      })
+    );
 
     menu.dishes?.forEach((dish) => {
-      this.putMenuPool_MenusControl(this.menus.length - 1).push(new FormGroup({
-        value: new FormControl(dish, [Validators.required])
-      }))
+      this.putMenuPool_MenusControl(this.menus.length - 1).push(
+        new FormGroup({
+          value: new FormControl(dish, [Validators.required]),
+        })
+      );
     });
   }
 
@@ -101,11 +114,12 @@ export class MenuVotingComponent {
     }
 
     for (let i = 0; i < this.postDishesFormArray.length; i++) {
-      this.postDishesFormArray.controls[i].reset(this.postDishesFormArray.controls[i].value);
+      this.postDishesFormArray.controls[i].reset(
+        this.postDishesFormArray.controls[i].value
+      );
     }
-    let menu = new Menu(null, this.dishes, this.menuPool.id);
 
-    this.menuVotingService.postMenu(this.menuPool.id, menu).subscribe({
+    this.menuService.postMenu(this.menuPool.id, { dishes: this.dishes, menuPoolId: this.menuPool.id }).subscribe({
       next: (response: Menu) => {
         this.isInputValid = true;
         this.menus.push(response);
@@ -116,16 +130,16 @@ export class MenuVotingComponent {
         console.log(error);
         this.isInputValid = false;
       },
-      complete: () => { }
+      complete: () => {},
     });
   }
 
   get putMenuFormArray(): FormArray {
-    return this.putMenuForm.get("menus") as FormArray;
+    return this.putMenuForm.get('menus') as FormArray;
   }
 
   loadVote() {
-    this.menuVotingService.getCurrentVote(this.menuPool.id).subscribe({
+    this.voteService.getCurrentVote(this.menuPool.id).subscribe({
       next: (response: Vote) => {
         this.selectedMenuId = response.menuId;
       },
@@ -134,12 +148,12 @@ export class MenuVotingComponent {
         console.log(error);
       },
 
-      complete: () => { }
+      complete: () => {},
     });
   }
 
   loadMenus() {
-    this.menuVotingService.getCurrentMenuPool().subscribe({
+    this.menuPoolService.getCurrentMenuPool().subscribe({
       next: (response: MenuPool) => {
         this.menus = response.menus;
         this.menuPool = response;
@@ -148,18 +162,22 @@ export class MenuVotingComponent {
 
         this.isCurrentMenuPoolCreated = true;
 
-        this.menus.forEach(menu => {
-          this.putMenuFormArray.push(new FormGroup({
-            id: new FormControl(menu.id, [Validators.required]),
-            dishes: new FormArray([]),
-          }));
+        this.menus.forEach((menu) => {
+          this.putMenuFormArray.push(
+            new FormGroup({
+              id: new FormControl(menu.id, [Validators.required]),
+              dishes: new FormArray([]),
+            })
+          );
         });
 
         this.menus.forEach((menu: Menu, ind) => {
           menu.dishes?.forEach((dish) => {
-            this.putMenuPool_MenusControl(ind).push(new FormGroup({
-              value: new FormControl(dish, [Validators.required])
-            }));
+            this.putMenuPool_MenusControl(ind).push(
+              new FormGroup({
+                value: new FormControl(dish, [Validators.required]),
+              })
+            );
           });
         });
 
@@ -171,7 +189,7 @@ export class MenuVotingComponent {
         this.isCurrentMenuPoolCreated = false;
       },
 
-      complete: () => { }
+      complete: () => {},
     });
   }
   ngOnInit() {
@@ -203,9 +221,8 @@ export class MenuVotingComponent {
   }
 
   public updateClicked(i: number) {
-    let menusToUpdate = [];
+    let menusToUpdate: Menu[] = [];
     console.log(this.putMenuFormArray.controls[i].value);
-
 
     for (var i = 0; i < this.menus.length; i++) {
       let dishesToUpdate = [];
@@ -213,27 +230,34 @@ export class MenuVotingComponent {
       for (var j = 0; j < menusControl.length; j++) {
         dishesToUpdate.push(menusControl.at(j).value.value);
       }
-      menusToUpdate.push(new Menu(this.putMenuPool_IdControl(i).value, dishesToUpdate, this.menuPool.id));
+      menusToUpdate.push({
+        id: this.putMenuPool_IdControl(i).value,
+        dishes: dishesToUpdate,
+        menuPoolId: this.menuPool.id,
+      });
     }
 
-    const menuPoolUpdate = new MenuPool(this.menuPool.id, menusToUpdate, this.accountService.restaurantId);
-    this.menuVotingService.putMenuPool(this.menuPool.id, menuPoolUpdate).subscribe({
-      next: (response: string) => {
-        this.editId = null;
-        this.putMenuForm.reset(this.putMenuForm.value);
-      },
-      error: (error: any) => {
-        console.log(error)
-      },
-      complete: () => {
-
-      }
-    })
+    this.menuPoolService
+      .putMenuPool(this.menuPool.id, {
+        id: this.menuPool.id,
+        menus: menusToUpdate,
+        restaurantId: this.accountService.restaurantId!,
+      })
+      .subscribe({
+        next: (response: string) => {
+          this.editId = null;
+          this.putMenuForm.reset(this.putMenuForm.value);
+        },
+        error: (error: any) => {
+          console.log(error);
+        },
+        complete: () => {},
+      });
   }
 
   public deleteClicked(menu: Menu, i: number): void {
     if (confirm(`Are you sure to delete this System: ${menu.dishes}?`)) {
-      this.menuVotingService.deleteMenu(menu.id).subscribe({
+      this.menuService.deleteMenu(menu.id).subscribe({
         next: (response: string) => {
           console.log(response);
           //this.editId = null;
@@ -244,8 +268,8 @@ export class MenuVotingComponent {
         error: (error: any) => {
           console.log(error);
         },
-        complete: () => { }
-      })
+        complete: () => {},
+      });
     }
   }
 
@@ -258,17 +282,21 @@ export class MenuVotingComponent {
   }
 
   public vote(): void {
-    let vote = new Vote(null, this.accountService.userId, this.selectedMenuId);
-    this.menuVotingService.castVote(this.menuPool.id, vote).subscribe({
-      next: (response: Vote) => {
-        this.selectedMenuId = response.menuId;
-      },
-      error: (error: any) => {
-        console.log(error);
-        this.selectedMenuId = null;
-      },
-      complete: () => { }
-    })
+    this.voteService
+      .castVote(this.menuPool.id, {
+        userId: this.accountService.userId!,
+        menuId: this.selectedMenuId!,
+      })
+      .subscribe({
+        next: (response: Vote) => {
+          this.selectedMenuId = response.menuId;
+        },
+        error: (error: any) => {
+          console.log(error);
+          this.selectedMenuId = null;
+        },
+        complete: () => {},
+      });
   }
 
   public resizePostForm(): void {
@@ -279,17 +307,21 @@ export class MenuVotingComponent {
       for (var i = length; i < this.rows; i++) {
         this.dishes.push('');
       }
-    }
-    else {
+    } else {
       while (this.dishes.length != this.rows) {
         this.dishes.pop();
       }
     }
     this.postDishesFormArray.clear();
     this.dishes.forEach((dish) => {
-      this.postDishesFormArray.push(new FormGroup({
-        value: new FormControl(dish, [Validators.required, Validators.pattern("^[a-zA-Z]+$")])
-      }));
+      this.postDishesFormArray.push(
+        new FormGroup({
+          value: new FormControl(dish, [
+            Validators.required,
+            Validators.pattern('^[a-zA-Z]+$'),
+          ]),
+        })
+      );
     });
   }
 }

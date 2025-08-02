@@ -40,5 +40,16 @@ public class MappingProfile : Profile
 			.ForMember(dest => dest.RestaurantId, opt => opt.MapFrom(src => src.RestaurantId))
 			.ForMember(dest => dest.Menus, opt => opt.MapFrom(src => new List<Menu>())).
 			ForMember(dest => dest.Date, opt => opt.MapFrom(src => DateOnly.FromDateTime(DateTime.UtcNow)));
+
+		CreateMap<Vote, VoteResponse>()
+			   .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+			   .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+			   .ForMember(dest => dest.MenuId, opt => opt.MapFrom(src => src.MenuId));
+
+		CreateMap<Menu, MenuResponse>()
+			   .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+			   .ForMember(dest => dest.MenuPoolId, opt => opt.MapFrom(src => src.MenuPoolId))
+			   .ForMember(dest => dest.Dishes, opt => opt.MapFrom(src => src.Dishes))
+			   .ForMember(dest => dest.Votes, opt => opt.MapFrom(src => src.Votes));
 	}
 }

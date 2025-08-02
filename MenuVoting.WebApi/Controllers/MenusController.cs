@@ -24,12 +24,12 @@ public class MenusController : ControllerBase
 		return Ok(deleteSucceeded);
 	}
 
-	[HttpPost("{id}/")]
+	[HttpPost("{id}")]
 	[Authorize(Roles = "Admin")]
-	public async Task<ActionResult<MenuPool>> AddMenuToMenuPool(Guid id, MenuCreate menuCreate)
+	public async Task<ActionResult<MenuResponse>> AddMenuToMenuPool(Guid id, MenuCreate menuCreate)
 	{
-		Menu menu = await _menuService.CreateMenu(menuCreate);
+		var menu = await _menuService.CreateMenu(menuCreate);
 
-		return CreatedAtAction(nameof(MenuPoolsController.GetMenuPool), new { id }, menu);
+		return Ok(menu);
 	}
 }

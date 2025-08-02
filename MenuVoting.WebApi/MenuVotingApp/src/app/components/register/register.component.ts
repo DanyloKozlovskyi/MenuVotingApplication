@@ -1,19 +1,30 @@
-import { Component, ElementRef, Renderer2, ViewChild, AfterViewInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  ElementRef,
+  Renderer2,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
-import { AccountService } from 'src/app/services/account/account.service';
-import { RegisterUser } from 'src/app/models/register-user/register-user';
+import { AccountService } from 'src/app/core/services/account.service';
+import { RegisterUser } from 'src/app/core/models/register-user';
 import { CommonModule } from '@angular/common';
-import { Restaurant } from 'src/app/models/restaurant/restaurant';
-import { RestaurantService } from 'src/app/services/restaurant/restaurant.service';
-
+import { Restaurant } from 'src/app/core/models/restaurant';
+import { RestaurantService } from 'src/app/core/services/restaurant.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrl: './register.component.css',
 })
 export class RegisterComponent implements AfterViewInit {
   registerForm: FormGroup;
@@ -22,7 +33,12 @@ export class RegisterComponent implements AfterViewInit {
   restaurants: Restaurant[] = [];
   selectedRestaurant: Restaurant | null = null;
 
-  constructor(private accountService: AccountService, private restaurantService: RestaurantService, private router: Router, private renderer: Renderer2) {
+  constructor(
+    private accountService: AccountService,
+    private restaurantService: RestaurantService,
+    private router: Router,
+    private renderer: Renderer2
+  ) {
     //this.renderer.listen('document', 'click', () => {
     //  this.hideList();
     //});
@@ -35,7 +51,7 @@ export class RegisterComponent implements AfterViewInit {
       confirmPassword: new FormControl(null, [Validators.required]),
       restaurants: new FormArray([]),
       restaurantId: new FormControl(null, [Validators.required]),
-      isAdmin: new FormControl(false, [Validators.required])
+      isAdmin: new FormControl(false, [Validators.required]),
     });
     this.fillRestaurants();
   }
@@ -61,7 +77,8 @@ export class RegisterComponent implements AfterViewInit {
 
   selectRestaurant(restaurant: Restaurant) {
     this.selectedRestaurant = restaurant;
-    this.restaurantInput.nativeElement.value = restaurant.name + " " + restaurant.address;
+    this.restaurantInput.nativeElement.value =
+      restaurant.name + ' ' + restaurant.address;
     // to use setValue() explicitly cast object to FormControl
     this.registerRestaurantIdControl.setValue(restaurant.id);
     this.hideList();
@@ -70,25 +87,23 @@ export class RegisterComponent implements AfterViewInit {
   preventClose(event: MouseEvent) {
     event.stopPropagation();
   }
-  
+
   public fillRestaurants() {
     this.restaurantService.getRestaurants().subscribe({
       next: (response: Restaurant[]) => {
         this.registerRestaurantsFormArray.clear();
-        response.forEach(r => {
+        response.forEach((r) => {
           this.registerRestaurantsFormArray.push(new FormControl(r));
         });
         this.restaurants.length = 0;
-        response.forEach(r => {
+        response.forEach((r) => {
           this.restaurants.push(r);
         });
       },
       error: (error) => {
         console.log(error);
       },
-      complete: () => {
-
-      }
+      complete: () => {},
     });
   }
 
@@ -108,7 +123,7 @@ export class RegisterComponent implements AfterViewInit {
     return this.registerForm.controls['confirmPassword'] as FormControl;
   }
   get registerRestaurantsFormArray(): FormArray {
-    return this.registerForm.get("restaurants") as FormArray;
+    return this.registerForm.get('restaurants') as FormArray;
   }
   get registerRestaurantIdControl(): FormControl {
     return this.registerForm.controls['restaurantId'] as FormControl;
@@ -125,8 +140,8 @@ export class RegisterComponent implements AfterViewInit {
           this.isRegisterValid = true;
           this.accountService.currentToken = response.email;
           this.isRegisterFormSubmitted = false;
-          localStorage["token"] = response.token;
-          localStorage["refreshToken"] = response.refreshToken;
+          localStorage['token'] = response.token;
+          localStorage['refreshToken'] = response.refreshToken;
 
           this.router.navigate(['/menu-voting']);
 
@@ -137,7 +152,7 @@ export class RegisterComponent implements AfterViewInit {
           this.isRegisterValid = false;
           console.log(error);
         },
-        complete: () => { }
+        complete: () => {},
       });
     }
   }

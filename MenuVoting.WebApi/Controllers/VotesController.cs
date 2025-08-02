@@ -16,15 +16,15 @@ public class VotesController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<ActionResult<MenuPool>> CastVote([FromQuery] Guid menuPoolId, VoteCreate voteCreate)
+	public async Task<ActionResult<Vote>> CastVote([FromQuery] Guid menuPoolId, VoteCreate voteCreate)
 	{
-		Vote vote = await _voteService.CreateVote(menuPoolId, voteCreate);
+		var vote = await _voteService.CreateVote(menuPoolId, voteCreate);
 
-		return CreatedAtAction(nameof(MenuPoolsController.GetMenuPool), new { id = menuPoolId }, voteCreate);
+		return Ok(vote);
 	}
 
 	[HttpGet]
-	public async Task<ActionResult<MenuPool>> GetCurrentVote([FromQuery] Guid menuPoolId)
+	public async Task<ActionResult<Vote>> GetCurrentVote([FromQuery] Guid menuPoolId)
 	{
 		var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
