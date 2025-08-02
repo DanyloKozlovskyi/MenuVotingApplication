@@ -24,7 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MenuVoting.DataAccess\MenuVoting.DataAccess.csproj" />
+    <ProjectReference Include="..\MenuVoting.Application\MenuVoting.Application.csproj" />
+    <ProjectReference Include="..\MenuVoting.DataAccess\MenuVoting.Persistence.csproj" />
+    <ProjectReference Include="..\MenuVoting.Domain\MenuVoting.Domain.csproj" />
+    <ProjectReference Include="..\MenuVoting.Persistence\MenuVoting.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,28 @@
+﻿using MenuVoting.Application.MenuPools;
+using MenuVoting.Application.Menus;
+using MenuVoting.Application.Votes;
+using MenuVoting.Domain.Entities;
+
+namespace MenuVoting.Application.MenuVotings;
+public interface IMenuVotingsService
+{
+	Task<IEnumerable<MenuPool>> GetMenuPools();
+
+	Task<MenuPool?> GetMenuPoolById(Guid id);
+
+	Task<bool> UpdateMenuPool(Guid id, MenuPool menuPool);
+
+	Task<MenuPool> CreateMenuPool(MenuPoolCreate menuPoolCreate);
+
+	Task<bool> DeleteMenuPool(Guid id);
+
+	Task<Vote> CreateVote(Guid menuPoolId, VoteCreate voteCreate);
+
+	Task<bool> CheckExistenceOfVote(Guid menuPoolId, VoteCreate voteCreate);
+
+	Task<Menu> CreateMenu(MenuCreate menuCreate);
+
+	Task<MenuPool?> CurrentMenuPool(Guid restaurantId);
+	Task<bool> DeleteMenu(Guid id);
+	Task<Vote?> CurrentVote(Guid menuPoolId, Guid userId);
+}
