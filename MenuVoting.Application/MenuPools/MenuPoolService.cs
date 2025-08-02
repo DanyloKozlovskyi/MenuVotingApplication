@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MenuVoting.Application.Mapper;
 using MenuVoting.Application.Menus;
+using MenuVoting.Application.Votes;
 using MenuVoting.Domain;
 using MenuVoting.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -92,6 +93,8 @@ public class MenuPoolService : IMenuPoolService
 					Id = m.Id,
 					Dishes = m.Dishes,
 					MenuPoolId = m.MenuPoolId,
+					Votes = m.Votes.Select(v => new VoteResponse { Id = v.Id, UserId = v.UserId })
+
 				})
 				.ToList()
 			})

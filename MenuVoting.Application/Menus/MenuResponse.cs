@@ -6,7 +6,7 @@ namespace MenuVoting.Application.Menus;
 public class MenuResponse : IDto<Menu, Guid>
 {
 	public Guid Id { get; set; }
-	public ICollection<string>? Dishes { get; set; }
+	public IEnumerable<string>? Dishes { get; set; }
 	public Guid MenuPoolId { get; set; }
-	public ICollection<VoteCreate>? Votes { get; set; }
+	public IEnumerable<VoteResponse>? Votes { get; set; }
 }
