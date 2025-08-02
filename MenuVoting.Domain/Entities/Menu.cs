@@ -8,7 +8,6 @@ public class Menu : IKeyedEntity<Guid>
 	public ICollection<string>? Dishes { get; set; }
 	[ForeignKey(nameof(Entities.MenuPool))]
 	public Guid MenuPoolId { get; set; }
-	[JsonIgnore]
 	public MenuPool? MenuPool { get; set; }
 	virtual public ICollection<Vote>? Votes { get; set; }
 }
