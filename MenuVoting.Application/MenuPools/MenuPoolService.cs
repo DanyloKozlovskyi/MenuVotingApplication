@@ -76,12 +76,10 @@ public class MenuPoolService : IMenuPoolService
 	public async Task<MenuPoolResponse?> CurrentMenuPool(Guid restaurantId)
 	{
 		var today = DateOnly.FromDateTime(DateTime.UtcNow);
-		//string includeProperties = nameof(MenuPool.Menus);
 
 		var menuPool = await _menuPoolRepository
 			.Get(
 				whereExpression: mp => mp.RestaurantId == restaurantId && mp.Date == today
-			//includeProperties: includeProperties
 			)
 			.Select(mp => new MenuPoolResponse
 			{
