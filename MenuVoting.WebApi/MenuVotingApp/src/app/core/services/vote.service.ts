@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Vote, VoteCreate } from 'src/app/core/models/vote';
+import { Vote, VoteCreate } from 'src/app/core/models';
 import { ENDPOINTS } from './api-endpoints';
 
 @Injectable({

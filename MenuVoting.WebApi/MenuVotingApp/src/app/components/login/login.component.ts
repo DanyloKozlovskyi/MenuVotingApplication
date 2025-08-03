@@ -7,9 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RegisterUser } from 'src/app/core/models/register-user';
-import { AccountService } from 'src/app/core/services/account.service';
-import { LoginUser } from 'src/app/core/models/login-user';
+import { AccountService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-login',
@@ -39,27 +37,22 @@ export class LoginComponent {
 
   loginSubmitted() {
     this.isLoginFormSubmitted = true;
-    if (this.loginForm.valid) {
-      this.accountService.postLogin(this.loginForm.value).subscribe({
-        next: (response: any) => {
-          this.isLoginValid = true;
 
-          this.accountService.currentToken = response.email;
-          this.isLoginFormSubmitted = false;
-          localStorage['token'] = response.token;
-          localStorage['refreshToken'] = response.refreshToken;
-          this.accountService.setUserRole(localStorage['token']);
-
-          this.router.navigate(['/menu-voting']);
-
-          this.loginForm.reset();
-        },
-        error: (error: any) => {
-          console.log(error);
-          this.isLoginValid = false;
-        },
-        complete: () => {},
-      });
+    if (this.loginForm.invalid) {
+      return;
     }
+
+    this.accountService.login(this.loginForm.value).subscribe({
+      next: () => {
+        this.isLoginValid = true;
+        this.isLoginFormSubmitted = false;
+        this.loginForm.reset();
+        this.router.navigate(['/menu-voting']);
+      },
+      error: err => {
+        console.error('Login failed', err);
+        this.isLoginValid = false;
+      }
+    });
   }
 }

@@ -1,327 +1,276 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  FormControl,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import {
+  switchMap,
+  tap,
+  take,
+  finalize,
+  map,
+  exhaustMap,
+  catchError,
+} from 'rxjs/operators';
+import {
+  AccountService,
+  MenuPoolService,
+  MenuService,
+  VoteService,
+} from 'src/app/core/services';
+import { Menu, MenuPool, Vote, MenuPoolCreate } from 'src/app/core/models';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Menu } from 'src/app/core/models/menu';
-import { AccountService } from 'src/app/core/services/account.service';
-import { MenuPoolService } from 'src/app/core/services/menu-pool.service';
-import { MenuService } from 'src/app/core/services/menu.service';
-import { VoteService } from 'src/app/core/services/vote.service';
-import { MenuPool } from 'src/app/core/models/menu-pool';
-import { Vote } from 'src/app/core/models/vote';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-menu-voting',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ProgressSpinnerModule],
   templateUrl: './menu-voting.component.html',
-  styleUrl: './menu-voting.component.css',
+  styleUrls: ['./menu-voting.component.css'],
+  changeDetection: ChangeDetectionStrategy.Default,
 })
-export class MenuVotingComponent {
-  rows: number = 3;
-  dishes: string[] = [];
-  postMenuForm: FormGroup;
-  isPostMenuFormSubmitted: boolean = false;
+export class MenuVotingComponent implements OnInit {
+  // existing-pool form
+  restaurantId!: string;
+  menusForm!: FormGroup;
+  selectedMenu$ = new BehaviorSubject<string | null>(null);
+
+  // for the "create new menu" flow:
   postRowsForm: FormGroup;
-  isPostDishesSubmitted: boolean = false;
-  menus: Menu[] = [];
-  putMenuForm: FormGroup;
-  loading: boolean = false;
-  isCurrentMenuPoolCreated: boolean = false;
-  isInputValid: boolean = true;
-  editId: string | null = null;
-  menuPool!: MenuPool;
-  selectedMenuId: string | null = null;
+  postMenuForm!: FormGroup;
+  rowOptions = [1, 2, 3, 4, 5, 6];
+  rows = 3;
+  poolExists = false;
+
+  isInputValid = true;
+  isPostMenuFormSubmitted = false;
+  isLoading = true;
+
+  private votedMenu$ = new BehaviorSubject<string | null>(null);
+
+  canRevote$ = combineLatest([this.votedMenu$, this.selectedMenu$]).pipe(
+    map(([original, selected]) => selected !== original && selected != null)
+  );
+
   constructor(
+    private fb: FormBuilder,
     private menuPoolService: MenuPoolService,
     private menuService: MenuService,
     private voteService: VoteService,
     public accountService: AccountService
   ) {
-    this.postMenuForm = new FormGroup({
-      dishes: new FormArray([]),
-    });
-
-    this.postRowsForm = new FormGroup({
-      rows: new FormControl(null),
-    });
-
-    this.putMenuForm = new FormGroup({
-      menus: new FormArray([]),
+    this.postRowsForm = this.fb.group({
+      rows: [3, Validators.required],
     });
   }
 
-  get postRows_RowsControl(): any {
-    return this.postRowsForm.controls['rows'];
+  ngOnInit() {
+    this.menusForm = this.fb.group({
+      poolId: [null, Validators.required],
+      menus: this.fb.array([]),
+    });
+
+    this.buildPostMenuForm();
+    this.loadCurrentPool();
+    this.readRestaurantId();
   }
+
+  get menusArray(): FormArray<FormGroup> {
+    return this.menusForm.get('menus') as FormArray;
+  }
+  getDishesArray(menuGroup: FormGroup): FormArray {
+    return menuGroup.get('dishes') as FormArray;
+  }
+  getDishesControls(menuGroup: FormGroup) {
+    return this.getDishesArray(menuGroup).controls as FormControl[];
+  }
+  trackByMenu(_i: number, g: FormGroup) {
+    return g.get('id')!.value;
+  }
+
+  private loadCurrentPool() {
+    this.isLoading = true;
+    this.menuPoolService
+      .getCurrentMenuPool()
+      .pipe(
+        tap((pool: MenuPool) => {
+          this.poolExists = true;
+          this.menusForm.patchValue({ poolId: pool.id });
+          this.resetMenus(pool.menus);
+        }),
+        switchMap((pool) =>
+          this.voteService.getCurrentVote(pool.id).pipe(
+            tap((vote: Vote) => {
+              this.selectedMenu$.next(vote.menuId);
+              this.votedMenu$.next(vote.menuId);
+              console.log(this.votedMenu$.value);
+              console.log(this.selectedMenu$.value);
+            })
+          )
+        ),
+        finalize(() => (this.isLoading = false))
+      )
+      .subscribe();
+  }
+
+  private readRestaurantId() {
+    this.accountService.restaurantId$.pipe(take(1)).subscribe((id) => {
+      this.restaurantId = id ?? '';
+    });
+  }
+
+  onCreatePool() {
+    this.isLoading = true;
+    this.menuPoolService
+      .createMenuPool({
+        restaurantId: this.restaurantId,
+        menus: [],
+      } as MenuPoolCreate)
+      .pipe(
+        tap((newPool: MenuPool) => {
+          this.poolExists = true;
+          this.menusForm.patchValue({ poolId: newPool.id });
+          this.resetMenus([]);
+        }),
+        finalize(() => (this.isLoading = false))
+      )
+      .subscribe();
+  }
+
+  private resetMenus(menus: Menu[]) {
+    this.menusArray.clear();
+    menus.forEach((m) =>
+      this.menusArray.push(
+        this.fb.group({
+          id: [m.id, Validators.required],
+          dishes: this.fb.array(
+            m.dishes.map((d) =>
+              this.fb.control(d, [
+                Validators.required,
+                Validators.pattern('^[a-zA-Z]+$'),
+              ])
+            )
+          ),
+        })
+      )
+    );
+  }
+
+  deleteMenu(i: number) {
+    const id = this.menusArray.at(i).get('id')!.value;
+    if (!confirm(`Really delete menu #${id}?`)) return;
+    this.menuService
+      .deleteMenu(id)
+      .pipe(tap(() => this.menusArray.removeAt(i)))
+      .subscribe();
+  }
+
+  selectMenu(menuId: string) {
+    this.selectedMenu$.next(
+      this.selectedMenu$.value === menuId ? null : menuId
+    );
+  }
+
+  vote() {
+    const poolId = this.menusForm.get('poolId')!.value!;
+    const menuId = this.selectedMenu$.value;
+    if (!menuId) {
+      this.selectedMenu$.next(null);
+      return;
+    }
+
+    this.accountService.userId$
+      .pipe(
+        take(1),
+        exhaustMap((uid) =>
+          this.voteService
+            .castVote(poolId, {
+              userId: uid!,
+              menuId: this.selectedMenu$.value ?? '', // or pass in directly from your UI handler
+            })
+            .pipe(
+              tap((v) => {
+                this.selectedMenu$.next(v.menuId);
+                this.votedMenu$.next(v.menuId);
+              }),
+
+              catchError((err) => {
+                this.selectedMenu$.next(null);
+                return err;
+              })
+            )
+        )
+      )
+      .subscribe();
+  }
+
+  get isAdmin$() {
+    return this.accountService.isAdmin$;
+  }
+
+  private buildPostMenuForm() {
+    this.rows = this.postRowsForm.value.rows!;
+    const arr = Array.from({ length: this.rows }).map(() =>
+      this.fb.group({ value: ['', Validators.required] })
+    );
+    this.postMenuForm = this.fb.group({ dishes: this.fb.array(arr) });
+  }
+
   get postDishesFormArray(): FormArray {
     return this.postMenuForm.get('dishes') as FormArray;
   }
 
-  public createMenuPoolSubmitted() {
-    const menuPool = {
-      menus: [],
-      restaurantId: this.accountService.restaurantId!,
-    };
-    this.menuPoolService.createMenuPool(menuPool).subscribe({
-      next: (response: MenuPool) => {
-        this.isInputValid = true;
-        this.isCurrentMenuPoolCreated = true;
-        this.menuPool = response;
-      },
-
-      error: (error: any) => {
-        console.log(error);
-        this.isInputValid = false;
-        this.isCurrentMenuPoolCreated = false;
-      },
-      complete: () => {},
-    });
+  resizePostForm() {
+    this.rows = this.postRowsForm.value.rows!;
+    const arr = this.postDishesFormArray;
+    while (arr.length < this.rows) {
+      arr.push(this.fb.group({ value: ['', Validators.required] }));
+    }
+    while (arr.length > this.rows) {
+      arr.removeAt(arr.length - 1);
+    }
   }
 
-  public fillPutMenuForm(menu: Menu) {
-    this.putMenuFormArray.push(
-      new FormGroup({
-        id: new FormControl(menu.id, [Validators.required]),
-        dishes: new FormArray([]),
-        menuPoolId: new FormControl(menu.menuPoolId, [Validators.required]),
-      })
-    );
-
-    menu.dishes?.forEach((dish) => {
-      this.putMenuPool_MenusControl(this.menus.length - 1).push(
-        new FormGroup({
-          value: new FormControl(dish, [Validators.required]),
-        })
-      );
-    });
-  }
-
-  public postMenuSubmitted() {
+  postMenuSubmitted() {
     this.isPostMenuFormSubmitted = true;
-    this.dishes = [];
-    this.loading = true;
+    if (this.postMenuForm.invalid) {
+      this.isInputValid = false;
+      return;
+    }
     this.isInputValid = true;
-    for (let i = 0; i < this.postDishesFormArray.length; i++) {
-      if (this.postDishesFormArray.at(i).invalid) {
-        this.isInputValid = false;
-        return;
-      }
-    }
-    for (let i = 0; i < this.postDishesFormArray.length; i++) {
-      let dish = this.postDishesFormArray.at(i).value.value as string;
-      this.dishes.push(dish);
-    }
 
-    for (let i = 0; i < this.postDishesFormArray.length; i++) {
-      this.postDishesFormArray.controls[i].reset(
-        this.postDishesFormArray.controls[i].value
-      );
-    }
-
-    this.menuService.postMenu(this.menuPool.id, { dishes: this.dishes, menuPoolId: this.menuPool.id }).subscribe({
-      next: (response: Menu) => {
-        this.isInputValid = true;
-        this.menus.push(response);
-        this.fillPutMenuForm(response);
-      },
-
-      error: (error: any) => {
-        console.log(error);
-        this.isInputValid = false;
-      },
-      complete: () => {},
-    });
-  }
-
-  get putMenuFormArray(): FormArray {
-    return this.putMenuForm.get('menus') as FormArray;
-  }
-
-  loadVote() {
-    this.voteService.getCurrentVote(this.menuPool.id).subscribe({
-      next: (response: Vote) => {
-        this.selectedMenuId = response.menuId;
-      },
-
-      error: (error: any) => {
-        console.log(error);
-      },
-
-      complete: () => {},
-    });
-  }
-
-  loadMenus() {
-    this.menuPoolService.getCurrentMenuPool().subscribe({
-      next: (response: MenuPool) => {
-        this.menus = response.menus;
-        this.menuPool = response;
-
-        this.putMenuFormArray.clear();
-
-        this.isCurrentMenuPoolCreated = true;
-
-        this.menus.forEach((menu) => {
-          this.putMenuFormArray.push(
-            new FormGroup({
-              id: new FormControl(menu.id, [Validators.required]),
-              dishes: new FormArray([]),
+    const dishes = this.postDishesFormArray.value.map((d: any) => d.value);
+    const poolId = this.menusForm.get('poolId')!.value!;
+    this.menuService
+      .postMenu(poolId, { menuPoolId: poolId, dishes })
+      .pipe(
+        tap((newMenu: Menu) => {
+          // append it into the existing list
+          this.menusArray.push(
+            this.fb.group({
+              id: [newMenu.id, Validators.required],
+              dishes: this.fb.array(
+                newMenu.dishes.map((d) =>
+                  this.fb.control(d, [
+                    Validators.required,
+                    Validators.pattern('^[a-zA-Z]+$'),
+                  ])
+                )
+              ),
             })
           );
-        });
 
-        this.menus.forEach((menu: Menu, ind) => {
-          menu.dishes?.forEach((dish) => {
-            this.putMenuPool_MenusControl(ind).push(
-              new FormGroup({
-                value: new FormControl(dish, [Validators.required]),
-              })
-            );
-          });
-        });
-
-        this.loadVote();
-      },
-
-      error: (error: any) => {
-        console.log(error);
-        this.isCurrentMenuPoolCreated = false;
-      },
-
-      complete: () => {},
-    });
-  }
-  ngOnInit() {
-    this.loadMenus();
-  }
-
-  public putMenuPool_MenusControl(i: number): FormArray {
-    let currentFormGroup = this.putMenuFormArray.controls[i] as FormGroup;
-    return currentFormGroup.controls['dishes'] as FormArray;
-  }
-
-  public putMenuPool_IdControl(i: number): FormArray {
-    let currentFormGroup = this.putMenuFormArray.controls[i] as FormGroup;
-    return currentFormGroup.controls['id'] as FormArray;
-  }
-
-  public editClicked(menu: Menu, i: number) {
-    this.editId = menu.id;
-
-    const dishesControl = this.putMenuPool_MenusControl(i);
-
-    //for (let j = 0; j < dishesControl.length; j++) {
-    //  if (dishesControl.at(j).disabled) {
-    //    dishesControl.at(j).enable();
-    //  } else {
-    //    dishesControl.at(j).disable();
-    //  }
-    //}
-  }
-
-  public updateClicked(i: number) {
-    let menusToUpdate: Menu[] = [];
-    console.log(this.putMenuFormArray.controls[i].value);
-
-    for (var i = 0; i < this.menus.length; i++) {
-      let dishesToUpdate = [];
-      const menusControl = this.putMenuPool_MenusControl(i);
-      for (var j = 0; j < menusControl.length; j++) {
-        dishesToUpdate.push(menusControl.at(j).value.value);
-      }
-      menusToUpdate.push({
-        id: this.putMenuPool_IdControl(i).value,
-        dishes: dishesToUpdate,
-        menuPoolId: this.menuPool.id,
-      });
-    }
-
-    this.menuPoolService
-      .putMenuPool(this.menuPool.id, {
-        id: this.menuPool.id,
-        menus: menusToUpdate,
-        restaurantId: this.accountService.restaurantId!,
-      })
-      .subscribe({
-        next: (response: string) => {
-          this.editId = null;
-          this.putMenuForm.reset(this.putMenuForm.value);
-        },
-        error: (error: any) => {
-          console.log(error);
-        },
-        complete: () => {},
-      });
-  }
-
-  public deleteClicked(menu: Menu, i: number): void {
-    if (confirm(`Are you sure to delete this System: ${menu.dishes}?`)) {
-      this.menuService.deleteMenu(menu.id).subscribe({
-        next: (response: string) => {
-          console.log(response);
-          //this.editId = null;
-
-          this.putMenuFormArray.removeAt(i);
-          this.menus.splice(i, 1);
-        },
-        error: (error: any) => {
-          console.log(error);
-        },
-        complete: () => {},
-      });
-    }
-  }
-
-  public onVoteChange(index: string | null): void {
-    if (this.selectedMenuId === index) {
-      this.selectedMenuId = null;
-    } else {
-      this.selectedMenuId = index;
-    }
-  }
-
-  public vote(): void {
-    this.voteService
-      .castVote(this.menuPool.id, {
-        userId: this.accountService.userId!,
-        menuId: this.selectedMenuId!,
-      })
-      .subscribe({
-        next: (response: Vote) => {
-          this.selectedMenuId = response.menuId;
-        },
-        error: (error: any) => {
-          console.log(error);
-          this.selectedMenuId = null;
-        },
-        complete: () => {},
-      });
-  }
-
-  public resizePostForm(): void {
-    this.rows = this.postRows_RowsControl.value;
-
-    if (this.dishes.length < this.rows) {
-      let length = this.dishes.length;
-      for (var i = length; i < this.rows; i++) {
-        this.dishes.push('');
-      }
-    } else {
-      while (this.dishes.length != this.rows) {
-        this.dishes.pop();
-      }
-    }
-    this.postDishesFormArray.clear();
-    this.dishes.forEach((dish) => {
-      this.postDishesFormArray.push(
-        new FormGroup({
-          value: new FormControl(dish, [
-            Validators.required,
-            Validators.pattern('^[a-zA-Z]+$'),
-          ]),
+          this.postRowsForm.patchValue({ rows: this.rowOptions[0] });
+          this.buildPostMenuForm();
+          this.isPostMenuFormSubmitted = false;
         })
-      );
-    });
+      )
+      .subscribe();
   }
 }

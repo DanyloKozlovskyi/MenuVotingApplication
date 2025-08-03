@@ -26,11 +26,11 @@ public class VoteService : IVoteService
 	{
 		if (await CheckExistenceOfVote(menuPoolId, voteCreate))
 		{
-			var voteToChange = await CurrentVote(menuPoolId, voteCreate.UserId);
+			var voteToChange = await _voteRepository.Get(whereExpression: x => x.UserId == voteCreate.UserId && x.Menu.MenuPool.Id == menuPoolId).FirstOrDefaultAsync();
 			voteToChange.MenuId = voteCreate.MenuId;
 
 			await _voteRepository.SaveChangesAsync();
-			return voteToChange;
+			return mapper.Map<VoteResponse>(voteToChange);
 		}
 
 		Vote vote = mapper.Map<Vote>(voteCreate);
@@ -49,14 +49,12 @@ public class VoteService : IVoteService
 
 	public async Task<VoteResponse?> CurrentVote(Guid menuPoolId, Guid userId)
 	{
-		//string includeProperties = $"{nameof(Vote.Menu)},{nameof(Vote.Menu)}.{nameof(Menu.MenuPool)}";
 
 		var vote = await _voteRepository
 			.Get(
 				whereExpression: v =>
 					v.UserId == userId
 					&& v.Menu.MenuPool.Id == menuPoolId
-			//includeProperties: includeProperties
 			)
 			.Select(v => new VoteResponse
 			{

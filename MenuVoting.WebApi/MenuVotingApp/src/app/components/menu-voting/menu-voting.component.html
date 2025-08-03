@@ -1,115 +1,156 @@
-<div class="flex">
-  <!-- left box begins-->
+<div *ngIf="isLoading" class="loader-container">
+  <p-progressSpinner></p-progressSpinner>
+</div>
 
-  <div class="flex-1">
-    <div class="table-container">
-      <table class="table" [formGroup]="putMenuForm" *ngIf="!isCurrentMenuPoolCreated">
+<div class="flex" *ngIf="!isLoading">
+  <div class="flex-1" *ngIf="poolExists">
+    <form [formGroup]="menusForm">
+      <div class="table-wrapper">
+        <table class="table w-full table-container">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>Dishes</th>
+              <th *ngIf="isAdmin$ | async">Actions</th>
+            </tr>
+          </thead>
 
-        <thead>
-          <tr>
-            <th>Create Menu Pool</th>
-          </tr>
-        </thead>
+          <tbody formArrayName="menus">
+            <tr
+              *ngFor="
+                let menuGroup of menusArray.controls;
+                let i = index;
+                trackBy: trackByMenu
+              "
+              [formGroupName]="i"
+            >
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="
+                    (selectedMenu$ | async) === menuGroup.get('id')!.value
+                  "
+                  (change)="selectMenu(menuGroup.get('id')!.value)"
+                />
+              </td>
+              <td formArrayName="dishes" style="display: flex; gap: 10px">
+                <ng-container
+                  *ngFor="
+                    let dishCtrl of getDishesControls(menuGroup);
+                    let j = index
+                  "
+                >
+                  <input
+                    type="text"
+                    [formControl]="dishCtrl"
+                    [readonly]="!(isAdmin$ | async)"
+                    class="form-input"
+                  />
+                  <span
+                    class="text-grey"
+                    *ngIf="j < getDishesControls(menuGroup).length - 1"
+                  >
+                  </span>
+                </ng-container>
+              </td>
+              <td *ngIf="isAdmin$ | async">
+                <button
+                  class="button button-red-back ml"
+                  type="button"
+                  (click)="deleteMenu(i)"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="flex" style="justify-content: flex-end">
+          <button
+            style="margin-top: 30px"
+            type="button"
+            class="button button-blue-back"
+            (click)="vote()"
+            [disabled]="!(canRevote$ | async)"
+            [class.button-disabled]="!(canRevote$ | async)"
+          >
+            Vote
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
 
-        <tbody>
-          <tr class="table-row row-justify-center">
-            <td style="width:200px">
-              <button class="button button-blue-back" (click)="createMenuPoolSubmitted()">
-                Create
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <table class="table w-100" [formGroup]="putMenuForm" *ngIf="isCurrentMenuPoolCreated">
-
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Menu Pool</th>
-            <th></th>
-          </tr>
-        </thead>
-
-        <tbody formArrayName="menus">
-          <tr [formGroupName]="i" *ngFor="let menu of menus; let i = index" class="table-row-left">
-            <td>
-              <input type="checkbox"
-                     [checked]="selectedMenuId === menu.id"
-                     (change)="onVoteChange(menu.id)" />
-            </td>
-
-            <td formArrayName="dishes" *ngFor="let dish of putMenuPool_MenusControl(i).controls; let j = index" class="table-data-6 string-item">
-              <div *ngIf="j !== 0" [formGroupName]="j">
-                <input type="text" formControlName="value" [ngClass]=" { 'border-less-textbox': menu.id != editId, 'form-input': menu.id == editId }" value="{{dish.value.value}}" />
-                <span class="text-grey flex-text" *ngIf="j != putMenuPool_MenusControl(i).length - 1">, </span>
-              </div>
-              <div *ngIf="j === 0" [formGroupName]="j">
-                <input type="text" formControlName="value" [ngClass]=" { 'border-less-textbox': menu.id != editId, 'form-input': menu.id == editId }" value="{{dish.value.value}}" />
-                <span class="text-grey flex-text" *ngIf="j != putMenuPool_MenusControl(i).length - 1">, </span>
-              </div>
-            </td>
-            <!--it was 200px there-->
-            <td style="width:50px" class="button-container" *ngIf="accountService.isAdmin">
-              <button class="button button-red-back ml" (click)="deleteClicked(menu, i)" *ngIf="menu.id != editId" type="button">Delete</button>
-              <button class="button button-blue-back ml" (click)="editClicked(menu, i)" *ngIf="menu.id != editId" type="button">Edit</button>
-              <button class="button button-blue-back" (click)="updateClicked(i)" *ngIf="menu.id == editId" type="submit">Update</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <button type="button" class="button button-blue-back mt" (click)="vote()" *ngIf="isCurrentMenuPoolCreated">
-      Vote
+  <div class="flex-1" *ngIf="!poolExists">
+    <p>There is no menu pool.</p>
+    <button
+      class="button button-blue-back create-button"
+      *ngIf="isAdmin$ | async"
+      (click)="onCreatePool()"
+    >
+      Create Pool
     </button>
   </div>
-  <!--it was w-50 there-->
-  <div class="flex-1 w-50">
-    <div class="form-container" *ngIf="isCurrentMenuPoolCreated && accountService.isAdmin">
-      <form [formGroup]="postRowsForm">
-        <select id="rows" formControlName="rows" (change)="resizePostForm()">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3" selected="selected">3</option>
-          <option value="4">4</option>
-        </select>
-      </form>
-      <div class="table-container">
-        <table class="table" [formGroup]="postMenuForm">
+
+  <div class="flex-1" *ngIf="poolExists && (isAdmin$ | async)">
+    <!-- selector -->
+    <form [formGroup]="postRowsForm" class="form-container mb">
+      <label for="rows">Number of dishes:</label>
+      <select id="rows" formControlName="rows" (change)="resizePostForm()">
+        <option *ngFor="let n of rowOptions" [value]="n">{{ n }}</option>
+      </select>
+    </form>
+
+    <!-- dynamically-sized inputs -->
+    <div class="table-container">
+      <form [formGroup]="postMenuForm" class="table">
+        <table>
           <thead>
             <tr>
               <th>Enter dish</th>
             </tr>
           </thead>
-
           <tbody>
             <tr formArrayName="dishes" class="table-row">
-              <td *ngFor="let row of postDishesFormArray.controls; let i = index" [ngClass]="{'table-data-2': rows === 2, 'table-data-3': rows === 3,
-             'table-data-4': rows === 4, 'table-data-5': rows === 5, 'table-data-6': rows === 6 }">
-                <div *ngIf="i !== 0" [formGroupName]="i">
-                  <input type="text" formControlName="value" class="form-input-parameter" value="{{row}}" />
-                  <span class="text-grey flex-text-x" *ngIf="i !== rows - 1">, </span>
-                </div>
-                <div *ngIf="i === 0" [formGroupName]="i">
-                  <input type="text" formControlName="value" class="form-input-parameter" value="{{row}}" />
-                  <span class="text-grey flex-text" *ngIf="i !== rows - 1">, </span>
+              <td
+                *ngFor="
+                  let ctrl of postDishesFormArray.controls;
+                  let i = index;
+                  let last = last
+                "
+                [formGroupName]="i"
+                [ngClass]="'table-data-' + rows"
+              >
+                <!-- wrap the input in a container we can target in CSS -->
+                <div class="dish-input">
+                  <input
+                    type="text"
+                    formControlName="value"
+                    class="form-input-parameter"
+                  />
                 </div>
               </td>
             </tr>
-
             <tr class="table-row">
-              <td style="width:200px">
-                <button class="button button-blue-back" (click)="postMenuSubmitted()">
+              <td style="width: 200px">
+                <button
+                  class="button button-blue-back"
+                  (click)="postMenuSubmitted()"
+                >
                   Create
                 </button>
               </td>
               <td>
-                <span class="text-red" *ngIf="!isInputValid && isPostMenuFormSubmitted">Incorrect input</span>
+                <span
+                  class="text-red"
+                  *ngIf="!isInputValid && isPostMenuFormSubmitted"
+                  >Incorrect input</span
+                >
               </td>
             </tr>
           </tbody>
         </table>
-      </div>
+      </form>
     </div>
   </div>
 </div>

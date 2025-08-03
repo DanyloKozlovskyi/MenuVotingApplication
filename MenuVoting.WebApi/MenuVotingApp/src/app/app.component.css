@@ -1,0 +1,8 @@
+.app-header {
+  display: flex;
+  justify-content: flex-end !important;
+  .sign-in-header {
+    gap: 20px;
+  }
+  padding-right: 50px;
+}

@@ -1,44 +1,50 @@
 <div class="container">
-  <div class="page-content">
-    <div class="margin-bottom">
-      <div class="flex-1">
-        <h2 class="app-title">
-          Menu Voting Application
-        </h2>
-      </div>
-      <div class="flex-1" id="search-box-div">
-        <div class="navbar account-links">
+  <header class="page-header margin-bottom flex items-center justify-between app-header">
+    <nav class="navbar account-links">
+      <ng-container *ngIf="!(auth.token$ | async); else loggedInLinks">
+        <ul class="sign-in-header">
+          <li><a routerLink="/login">Login</a></li>
+          <li><a routerLink="/register">Register</a></li>
+        </ul>
+      </ng-container>
 
-          <ul *ngIf="accountService.currentToken == '' || accountService.currentToken == null">
-            <li>
-              <a [routerLink]="[ '/login' ]">Login</a>
-            </li>
-            <li>
-              <a [routerLink]="[ '/register' ]">Register</a>
-            </li>
-          </ul>
+      <ng-template #loggedInLinks>
+        <ul>
+          <li>
+            <a href="#" (click)="logOutClicked(); $event.preventDefault()">
+              Logout
+            </a>
+          </li>
+        </ul>
+      </ng-template>
+    </nav>
+  </header>
 
-          <ul *ngIf="accountService.currentToken != '' && accountService.currentToken != null">
-            <li>
-              <a href="#" onclick="return false" (click)="logOutClicked()">Logout</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="navbar mb">
+  <nav class="navbar mb" *ngIf="auth.token$ | async">
+    <ul class="flex space-x-4">
+      <li>
+        <a
+          routerLink="/menu-voting"
+          routerLinkActive="nav-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Menu Voting
+        </a>
+      </li>
+      <li *ngIf="auth.isAdmin$ | async">
+        <a
+          routerLink="/menu-pool"
+          routerLinkActive="nav-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Menu Pool
+        </a>
+      </li>
+    </ul>
+  </nav>
 
-      <ul *ngIf="accountService.currentToken !== '' && accountService.currentToken !== null && accountService.currentToken !== undefined">
-        <li>
-          <a [routerLink]="[ '/menu-voting' ]" [routerLinkActive]="['nav-active']">menu-voting</a>
-        </li>
-        <li *ngIf="accountService.isAdmin">
-          <a [routerLink]="[ '/menu-pool' ]" [routerLinkActive] = "['nav-active']">menu-pool</a>
-        </li>
-      </ul>
-    </div>
-    <div class="body">
-      <router-outlet></router-outlet>
-    </div>
-  </div>
+  <!-- Routed views -->
+  <main class="body page-content">
+    <router-outlet></router-outlet>
+  </main>
 </div>

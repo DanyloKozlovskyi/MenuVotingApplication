@@ -13,11 +13,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AccountService } from 'src/app/core/services/account.service';
-import { RegisterUser } from 'src/app/core/models/register-user';
+import { AccountService, RestaurantService } from 'src/app/core/services';
 import { CommonModule } from '@angular/common';
-import { Restaurant } from 'src/app/core/models/restaurant';
-import { RestaurantService } from 'src/app/core/services/restaurant.service';
+import { Restaurant } from 'src/app/core/models';
 
 @Component({
   selector: 'app-register',
@@ -39,9 +37,6 @@ export class RegisterComponent implements AfterViewInit {
     private router: Router,
     private renderer: Renderer2
   ) {
-    //this.renderer.listen('document', 'click', () => {
-    //  this.hideList();
-    //});
 
     this.registerForm = new FormGroup({
       personName: new FormControl(null, [Validators.required]),
@@ -89,7 +84,7 @@ export class RegisterComponent implements AfterViewInit {
   }
 
   public fillRestaurants() {
-    this.restaurantService.getRestaurants().subscribe({
+    this.restaurantService.getAll().subscribe({
       next: (response: Restaurant[]) => {
         this.registerRestaurantsFormArray.clear();
         response.forEach((r) => {
@@ -134,26 +129,22 @@ export class RegisterComponent implements AfterViewInit {
 
   registerSubmitted() {
     this.isRegisterFormSubmitted = true;
-    if (this.registerForm.valid) {
-      this.accountService.postRegister(this.registerForm.value).subscribe({
-        next: (response: any) => {
-          this.isRegisterValid = true;
-          this.accountService.currentToken = response.email;
-          this.isRegisterFormSubmitted = false;
-          localStorage['token'] = response.token;
-          localStorage['refreshToken'] = response.refreshToken;
 
-          this.router.navigate(['/menu-voting']);
-
-          this.registerForm.reset();
-        },
-        error: (error: any) => {
-          console.log('incorrect response');
-          this.isRegisterValid = false;
-          console.log(error);
-        },
-        complete: () => {},
-      });
+    if (!this.registerForm.valid) {
+      return;
     }
+
+    this.accountService.register(this.registerForm.value).subscribe({
+      next: () => {
+        this.isRegisterValid = true;
+        this.isRegisterFormSubmitted = false;
+        this.registerForm.reset();
+        this.router.navigate(['/menu-voting']);
+      },
+      error: (err) => {
+        console.error('Registration failed', err);
+        this.isRegisterValid = false;
+      },
+    });
   }
 }

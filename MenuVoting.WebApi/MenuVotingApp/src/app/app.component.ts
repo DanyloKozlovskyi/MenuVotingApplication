@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+// app.component.ts
+import { Component } from '@angular/core';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AccountService } from 'src/app/core/services/account.service';
 import { CommonModule } from '@angular/common';
+import { AccountService } from 'src/app/core/services';
 
 @Component({
   selector: 'app-root',
@@ -16,32 +17,21 @@ import { CommonModule } from '@angular/common';
     CommonModule,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
-  constructor(public accountService: AccountService, private router: Router) {}
-
-  ngOnInit(): void {
-    if (typeof window !== 'undefined' && localStorage) {
-      this.accountService.currentToken = localStorage['token'];
-      this.accountService.setUserRole(this.accountService.currentToken);
-    }
-  }
+export class AppComponent {
+  constructor(
+    public auth: AccountService,
+    private router: Router
+  ) {}
 
   logOutClicked() {
-    this.accountService.getLogout().subscribe({
-      next: (response: string) => {
-        this.accountService.currentToken = null;
-        this.accountService.isAdmin = false;
-
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
+    this.auth.logout().subscribe({
+      next: () => this.router.navigate(['/login']),
+      error: err => {
+        console.error('Logout failed', err);
         this.router.navigate(['/login']);
-      },
-      error: (error: any) => {
-        console.log(error);
-      },
-      complete: () => {},
+      }
     });
   }
 }

@@ -101,6 +101,22 @@ body {
   background-color: #ffffff;
   border-radius: 16px;
   margin-top: 7px;
+
+  th,
+  td {
+    padding: 1rem;
+    font-size: 1.125rem;
+  }
+
+  tr {
+    height: 3.5rem;
+  }
+}
+
+.button-disabled,
+button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .table {
@@ -531,8 +547,8 @@ a.button-link:visited {
   font-size: 105%;
   border-radius: 8px;
   border: 1px solid #d0d0d0;
-  width: 100%;
   transition: box-shadow 0.2s;
+  max-width: 120px;
 }
 
 .form-input:focus {
@@ -649,7 +665,6 @@ a.button-link:visited {
   background-color: #ffffff;
   border-radius: 15px;
   margin: auto;
-  width: 90%;
   padding: 20px;
 }
 
@@ -739,10 +754,6 @@ a.button-link:visited {
 
   .stocks-list {
     flex-direction: row;
-  }
-
-  .form-container {
-    padding: 20px;
   }
 
   .account-links {
@@ -840,19 +851,10 @@ a.button-link:visited {
   margin: auto 1px auto 0px;
 }
 
-.table-row-left {
-  /*width: 15%;
-  margin: auto 5% auto 5%;*/
+/* .table-row-left {
   height: max-content;
-  width: inherit;
   display: flex;
-  justify-content: left;
-}
-
-.table-row-left td:last-child {
-  text-align: right; /* Align the last <td> to the right */
-  margin-left: auto;
-}
+} */
 
 .search-box {
   width: 100%;

@@ -1,0 +1,60 @@
+.create-button {
+  margin-top: 20px;
+}
+
+.vote-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+.action-buttons {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.table-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.table-row-left {
+  display: flex;
+  width: 100%;
+}
+
+.table-row-left .cell:last-child {
+  flex: 1; /* grabs all leftover space */
+  display: flex; /* turn this cell into its own flex container */
+  justify-content: flex-end; /* pushes its children to the right */
+  align-items: center; /* vertically center if you like */
+}
+
+/* 4) Other cells only take as much as they need */
+.table-row-left .cell:not(:last-child) {
+  flex: 0 0 auto;
+}
+
+.vote-checkbox {
+  width: 10%;
+}
+
+.string-item {
+    flex: 1;
+}
+
+.table-wrapper {
+  width: 100%;        /* fill whatever space is available */
+  max-width: 600px;   /* but never get wider than 600px */
+  margin: 0 auto;     /* center it */
+}

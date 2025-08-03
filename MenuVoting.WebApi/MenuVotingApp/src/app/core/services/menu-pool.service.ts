@@ -1,60 +1,28 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/internal/Observable';
-import { MenuPool, MenuPoolCreate } from 'src/app/core/models/menu-pool';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { MenuPool, MenuPoolCreate } from 'src/app/core/models';
 import { ENDPOINTS } from './api-endpoints';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class MenuPoolService {
-  constructor(private httpClient: HttpClient) {}
+  private readonly baseUrl = ENDPOINTS.MENUPOOLS;
 
-  public getCurrentMenuPool(): Observable<MenuPool> {
-    let headers = new HttpHeaders();
-    headers = headers.set('Authorization', `Bearer ${localStorage['token']}`);
-    return this.httpClient.get<MenuPool>(`${ENDPOINTS.MENUPOOLS}/current`, {
-      headers: headers,
-    });
+  constructor(private http: HttpClient) {}
+
+  getCurrentMenuPool(): Observable<MenuPool> {
+    return this.http.get<MenuPool>(`${this.baseUrl}/current`);
   }
 
-  public createMenuPool(menuPool: MenuPoolCreate): Observable<MenuPool> {
-    let headers = new HttpHeaders();
-    headers = headers.append(
-      'Authorization',
-      `Bearer ${localStorage['token']}`
-    );
-    return this.httpClient.post<MenuPool>(
-      `${ENDPOINTS.MENUPOOLS}`,
-      menuPool,
-      { headers: headers }
-    );
+  createMenuPool(payload: MenuPoolCreate): Observable<MenuPool> {
+    return this.http.post<MenuPool>(this.baseUrl, payload);
   }
 
-  public putMenuPool(
-    menuPoolId: string,
-    menuPool: MenuPool
-  ): Observable<string> {
-    let headers = new HttpHeaders();
-    headers = headers.append(
-      'Authorization',
-      `Bearer ${localStorage['token']}`
-    );
-    return this.httpClient.put<string>(
-      `${ENDPOINTS.MENUPOOLS}/${menuPoolId}`,
-      menuPool,
-      { headers: headers }
-    );
+  updateMenuPool(id: string, payload: MenuPool): Observable<string> {
+    return this.http.put<string>(`${this.baseUrl}/${id}`, payload);
   }
 
-  public deleteMenuPool(id: string): Observable<string> {
-    let headers = new HttpHeaders();
-    headers = headers.append(
-      'Authorization',
-      `Bearer ${localStorage['token']}`
-    );
-    return this.httpClient.delete<string>(`${ENDPOINTS.MENUPOOLS}/${id}`, {
-      headers: headers,
-    });
+  deleteMenuPool(id: string): Observable<string> {
+    return this.http.delete<string>(`${this.baseUrl}/${id}`);
   }
 }

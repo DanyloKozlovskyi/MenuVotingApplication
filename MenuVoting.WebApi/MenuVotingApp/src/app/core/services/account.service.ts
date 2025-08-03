@@ -1,59 +1,123 @@
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { RegisterUser } from 'src/app/core/models/register-user';
-import { Observable } from 'rxjs';
-import { LoginUser } from 'src/app/core/models/login-user';
+import { isPlatformBrowser } from '@angular/common';
+import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
+import { CookieService } from 'ngx-cookie-service';
 import { ENDPOINTS } from './api-endpoints';
+import { LoginUser, RegisterUser } from 'src/app/core/models';
 
-@Injectable({
-  providedIn: 'root',
-})
+interface AuthResponse {
+  token: string;
+  refreshToken: string;
+}
+
+interface DecodedToken {
+  sub: string;
+  Organization: string;
+  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role': string;
+}
+
+@Injectable({ providedIn: 'root' })
 export class AccountService {
-  currentToken: string | null = null;
-  restaurantId: string | null = null;
-  isAdmin: boolean = false;
-  userId: string | null = null;
-  constructor(private httpClient: HttpClient) {}
+  private isBrowser: boolean;
+  private tokenSubject = new BehaviorSubject<string | null>(null);
+  readonly token$ = this.tokenSubject.asObservable();
 
-  setUserRole(token: string | null) {
-    if (token != null) {
-      const decodedToken = jwtDecode<{ [key: string]: any }>(token);
-      const role =
-        decodedToken[
-          'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-        ];
-      this.restaurantId = decodedToken['Organization'];
-      this.userId = decodedToken['sub'];
-      this.isAdmin = role === 'Admin';
+  readonly isAdmin$ = this.token$.pipe(
+    map((token) => {
+      if (!token) return false;
+      const {
+        'http://schemas.microsoft.com/ws/2008/06/identity/claims/role': role,
+      } = jwtDecode<DecodedToken>(token);
+      return role === 'Admin';
+    })
+  );
+
+  readonly userId$ = this.token$.pipe(
+    map((token) => (token ? jwtDecode<DecodedToken>(token).sub : null))
+  );
+
+  readonly restaurantId$ = this.token$.pipe(
+    map((token) => (token ? jwtDecode<DecodedToken>(token).Organization : null))
+  );
+
+  constructor(
+    private http: HttpClient,
+    private cookieService: CookieService,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+    if (this.isBrowser) {
+      const saved = this.cookieService.get('token');
+      this.tokenSubject.next(saved || null);
     }
   }
 
-  public postRegister(registerUser: RegisterUser): Observable<any> {
-    return this.httpClient.post<any>(
-      `${ENDPOINTS.ACCOUNT}/register`,
-      registerUser
-    );
+  register(payload: RegisterUser): Observable<void> {
+    return this.http.post<void>(`${ENDPOINTS.ACCOUNT}/register`, payload);
   }
 
-  public postLogin(loginUser: LoginUser): Observable<any> {
-    return this.httpClient.post<any>(`${ENDPOINTS.ACCOUNT}/login`, loginUser);
+  login(payload: LoginUser): Observable<void> {
+    return this.http
+      .post<AuthResponse>(`${ENDPOINTS.ACCOUNT}/login`, payload, {
+        withCredentials: true,
+      })
+      .pipe(
+        tap((res) => this.saveTokens(res)),
+        map(() => void 0)
+      );
   }
 
-  public getLogout(): Observable<string> {
-    return this.httpClient.get<string>(`${ENDPOINTS.ACCOUNT}/logout`);
+  logout(): Observable<void> {
+    return this.http
+      .get<void>(
+        `${ENDPOINTS.ACCOUNT}/logout`,
+        {
+          withCredentials: true,
+        }
+      )
+      .pipe(
+        tap(() => this.clearTokens()),
+        map(() => void 0)
+      );
   }
 
-  public postGenerateNewToken(): Observable<any> {
-    var token = localStorage['token'];
-    var refreshToken = localStorage['refreshToken'];
+  refreshToken(): Observable<void> {
+    return this.http
+      .post<AuthResponse>(
+        `${ENDPOINTS.ACCOUNT}/generate-new-jwt-token`,
+        {},
+        { withCredentials: true }
+      )
+      .pipe(
+        tap((res) => this.saveTokens(res)),
+        map(() => void 0)
+      );
+  }
 
-    return this.httpClient.post<any>(
-      `${ENDPOINTS.ACCOUNT}/generate-new-jwt-token`,
-      {
-        token: token,
-        refreshToken: refreshToken,
-      }
-    );
+  private saveTokens(res: AuthResponse) {
+    if (!this.isBrowser) return;
+
+    // Store as secure, sameSite=strict cookies
+    this.cookieService.set('token', res.token, {
+      path: '/',
+      secure: true,
+      sameSite: 'Strict',
+    });
+    this.cookieService.set('refreshToken', res.refreshToken, {
+      path: '/',
+      secure: true,
+      sameSite: 'Strict',
+    });
+    this.tokenSubject.next(res.token);
+  }
+
+  private clearTokens() {
+    if (this.isBrowser) {
+      this.cookieService.delete('token', '/');
+      this.cookieService.delete('refreshToken', '/');
+    }
+    this.tokenSubject.next(null);
   }
 }

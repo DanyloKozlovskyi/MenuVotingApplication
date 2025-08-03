@@ -1,16 +1,15 @@
 // src/app/app.config.ts
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter }   from '@angular/router';
-import { routes }          from './app.routes';
+import { provideRouter } from '@angular/router';
+import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import {
   provideHttpClient,
   withInterceptorsFromDi,
-  HTTP_INTERCEPTORS
+  HTTP_INTERCEPTORS,
 } from '@angular/common/http';
 
-import { AuthInterceptor } from 'src/app/core/services/auth.interceptor';
-import { AuthService }     from 'src/app/core/services/auth.service';
+import { AuthInterceptor, AuthService } from 'src/app/core/services';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,9 +22,9 @@ export const appConfig: ApplicationConfig = {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
-      multi: true
+      multi: true,
     },
-    
-    AuthService
-  ]
+
+    AuthService,
+  ],
 };
